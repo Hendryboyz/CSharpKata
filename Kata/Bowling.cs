@@ -4,51 +4,41 @@ namespace Kata
 {
     public class Bowling
     {
-        private readonly int NUM_OF_FRAME = 10;
         private int[] scoreBoard = new int[21];
-        private int throwIndex = 0;
+        private int rollIndex;
         private int frameStart = 0;
         private int currentFrame = 1;
+        private readonly int NUM_OF_FRAME = 10;
 
-        public int GetScores()
+        public int Scores()
         {
             int scores = 0;
-            for (int scoreIndex = 0, frame = 0; frame < NUM_OF_FRAME; frame++)
+            for (int boardIndex = 0, frame = 1; frame <= NUM_OF_FRAME; frame++)
             {
                 int rollInFrame = 2;
-                if (IsStrike(scoreIndex))
+                if (scoreBoard[boardIndex] == 10)
                 {
-                    int bonus = scoreBoard[scoreIndex + 1] + scoreBoard[scoreIndex + 2];
-                    scores += scoreBoard[scoreIndex] + bonus;
+                    int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
+                    scores += scoreBoard[boardIndex] + bonus;
                     rollInFrame = 1;
                 }
-                else if (IsSpare(scoreIndex))
+                else if (scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] == 10)
                 {
-                    int bonus = scoreBoard[scoreIndex + 2];
-                    scores += GetNormalScores(scoreIndex) + bonus;
+                    int bonus = scoreBoard[boardIndex + 2];
+                    scores += scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] + bonus;
                 }
                 else
                 {
-                    scores += GetNormalScores(scoreIndex);
+                    scores += GetNormalScores(boardIndex);
                 }
-                scoreIndex += rollInFrame;
+                boardIndex += rollInFrame;
             }
             return scores;
         }
 
-        private int GetNormalScores(int scoreIndex)
+        private int GetNormalScores(int boardIndex)
         {
-            return scoreBoard[scoreIndex] + scoreBoard[scoreIndex + 1];
-        }
-
-        private bool IsStrike(int scoreIndex)
-        {
-            return scoreBoard[scoreIndex] == 10;
-        }
-
-        private bool IsSpare(int scoreIndex)
-        {
-            return scoreBoard[scoreIndex] + scoreBoard[scoreIndex + 1] == 10;
+            return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1];
         }
 
         public void Roll(int pins)
@@ -57,19 +47,39 @@ namespace Kata
             {
                 throw new InvalidOperationException();
             }
-            scoreBoard[throwIndex++] = pins;
+            scoreBoard[rollIndex] = pins;
 
-            if (scoreBoard[frameStart] + scoreBoard[frameStart + 1] > 10)
+            if (scoreBoard[frameStart] + scoreBoard[frameStart+1] > 10)
             {
                 throw new InvalidOperationException();
             }
 
-            if (pins == 10  || throwIndex > frameStart + 1)
+            if (currentFrame < 10)
             {
-                if (currentFrame < 10)
+                rollIndex++;
+                if (pins == 10 || rollIndex > frameStart + 1)
                 {
-                    currentFrame++;
-                    frameStart = throwIndex;
+                    frameStart = rollIndex;
+                    currentFrame += 1;
+                }
+            }
+            else
+            {
+                if (scoreBoard[frameStart] == 10 && rollIndex < frameStart + 3)
+                {
+                    rollIndex++;
+                }
+                else if(scoreBoard[frameStart] + scoreBoard[frameStart + 1] == 10 && rollIndex < frameStart + 3)
+                {
+                    rollIndex++;
+                }
+                else if (rollIndex < frameStart + 2)
+                {
+                    rollIndex++;
+                }
+                else
+                {
+                    throw new InvalidOperationException();
                 }
             }
         }

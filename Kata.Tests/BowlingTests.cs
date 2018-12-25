@@ -4,12 +4,12 @@ using System;
 namespace Kata.Tests
 {
     [TestFixture]
-    class BowlingTests
+    public class BowlingTests
     {
         private Bowling game;
 
         [SetUp]
-        public void SetUp()
+        public void CanSetUp()
         {
             game = new Bowling();
             Assert.NotNull(game);
@@ -22,22 +22,17 @@ namespace Kata.Tests
             AssertScores(1);
         }
 
-        [Test]
-        public void CanGetScores()
+        private void AssertScores(int expected)
         {
-            game.Roll(1);
-            game.Roll(2);
-            AssertScores(3);
+            int scores = game.Scores();
+            Assert.AreEqual(expected, scores);
         }
 
         [Test]
-        public void Roll_GivenSpare_GetCorrectScores()
+        public void CanGetScores()
         {
-            game.Roll(1);
-            game.Roll(9);
-            game.Roll(5);
-            RollMany(17, 0);
-            AssertScores(20);
+            RollMany(20, 3);
+            AssertScores(60);
         }
 
         private void RollMany(int rollTimes, int pins)
@@ -48,56 +43,51 @@ namespace Kata.Tests
             }
         }
 
-        private void AssertScores(int expected)
+        [Test]
+        public void Roll_GivenSpare_ThenGetCorrectScores()
         {
-            int scores = game.GetScores();
-            Assert.AreEqual(expected, scores);
+            game.Roll(3);
+            game.Roll(7);
+            game.Roll(9);
+            RollMany(17, 0);
+            AssertScores(28);
         }
 
         [Test]
-        public void Roll_GivenStrike_GetCorrectScores()
+        public void Roll_GivenStrike_ThenGetCorrectScores()
         {
             game.Roll(10);
             game.Roll(3);
-            game.Roll(4);
+            game.Roll(6);
             RollMany(16, 0);
-            AssertScores(24);
+            AssertScores(28);
         }
 
         [Test]
-        public void Roll_PerfectGame_Get300Points()
+        public void Roll_GivenPerfectGame_ThenGet300Points()
         {
             RollMany(12, 10);
             AssertScores(300);
         }
 
         [Test]
-        public void Roll_RollMoreThan10Pins_ThrowInvalidOperationException()
+        public void Roll_GivenMoreThan10Pins_ThenThrowInvalidOperationException()
         {
             Assert.Throws<InvalidOperationException>(() => game.Roll(11));
         }
 
         [Test]
-        public void Roll_GivenPerfectSpare_Get150Points()
+        public void Roll_GivenRollMoreThan10PinsInFrame_ThenThrowInvalidOperationException()
         {
-            RollMany(21, 5);
-            AssertScores(150);
+            game.Roll(6);
+            Assert.Throws<InvalidOperationException>(() => game.Roll(5));
         }
 
-        [Test]
-        public void Roll_MoreThan10InAFrame_ThrowInvalidOperationException()
-        {
-            game.Roll(2);
-            Assert.Throws<InvalidOperationException>(() => game.Roll(9));
-        }
-
-        //[TestCase(21, 5)]
-        [TestCase(20, 1)]
         [TestCase(12, 10)]
-        public void Roll_MoreThan10Frames_ThrowInvalideOperationException(int rollTimes, int pins)
+        public void Roll_GivenMoreThen10Frames_ThenThrowInvalidOperationException(int rollTimes, int pins)
         {
             RollMany(rollTimes, pins);
-            Assert.Throws<InvalidOperationException>(() => game.Roll(0));
+            Assert.Throws<InvalidOperationException>(() => game.Roll(5));
         }
     }
 }

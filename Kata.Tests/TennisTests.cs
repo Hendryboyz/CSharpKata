@@ -3,14 +3,14 @@ using NUnit.Framework;
 namespace Kata.Tests
 {
     [TestFixture]
-    public class TennisGameTests
+    public class TennisTests
     {
-        private TennisGame game;
+        private Tennis game;
 
         [SetUp]
         public void SetUp()
         {
-            game = new TennisGame();
+            game = new Tennis();
             Assert.NotNull(game);
         }
 

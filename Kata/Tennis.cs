@@ -3,7 +3,7 @@
 namespace Kata
 {
     // http://codingdojo.org/kata/Tennis/
-    public class TennisGame
+    public class Tennis
     {
         private readonly string[] POINTS_DESCRIPTION =
             new string[] { "Love", "Fifteen", "Thirty", "Forty" };
