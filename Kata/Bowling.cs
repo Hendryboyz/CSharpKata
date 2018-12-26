@@ -4,42 +4,11 @@ namespace Kata
 {
     public class Bowling
     {
-        private int[] scoreBoard = new int[21];
-        private int rollIndex;
-        private int frameStart = 0;
-        private int currentFrame = 1;
         private readonly int NUM_OF_FRAME = 10;
-
-        public int Scores()
-        {
-            int scores = 0;
-            for (int boardIndex = 0, frame = 1; frame <= NUM_OF_FRAME; frame++)
-            {
-                int rollInFrame = 2;
-                if (scoreBoard[boardIndex] == 10)
-                {
-                    int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
-                    scores += scoreBoard[boardIndex] + bonus;
-                    rollInFrame = 1;
-                }
-                else if (scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] == 10)
-                {
-                    int bonus = scoreBoard[boardIndex + 2];
-                    scores += scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] + bonus;
-                }
-                else
-                {
-                    scores += GetNormalScores(boardIndex);
-                }
-                boardIndex += rollInFrame;
-            }
-            return scores;
-        }
-
-        private int GetNormalScores(int boardIndex)
-        {
-            return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1];
-        }
+        private int[] scoreBoard = new int[22];
+        private int rollTimes = 0;
+        private int frameStart = 0;
+        private int frame = 1;
 
         public void Roll(int pins)
         {
@@ -47,41 +16,82 @@ namespace Kata
             {
                 throw new InvalidOperationException();
             }
-            scoreBoard[rollIndex] = pins;
 
-            if (scoreBoard[frameStart] + scoreBoard[frameStart+1] > 10)
-            {
-                throw new InvalidOperationException();
-            }
+            scoreBoard[rollTimes] = pins;
 
-            if (currentFrame < 10)
+            if (frame < 10)
             {
-                rollIndex++;
-                if (pins == 10 || rollIndex > frameStart + 1)
+                rollTimes++;
+                if (scoreBoard[frameStart] + scoreBoard[frameStart + 1] > 10)
                 {
-                    frameStart = rollIndex;
-                    currentFrame += 1;
+                    throw new InvalidOperationException();
+                }
+                if (IsStrike(frameStart) || rollTimes > frameStart + 1)
+                {
+                    frameStart = rollTimes;
+                    frame++;
                 }
             }
             else
             {
-                if (scoreBoard[frameStart] == 10 && rollIndex < frameStart + 3)
+                if (IsStrike(frameStart) && rollTimes <= frameStart + 2)
                 {
-                    rollIndex++;
+                    rollTimes++;
                 }
-                else if(scoreBoard[frameStart] + scoreBoard[frameStart + 1] == 10 && rollIndex < frameStart + 3)
+                else if (IsSpare(frameStart) && rollTimes <= frameStart + 2)
                 {
-                    rollIndex++;
+                    rollTimes++;
                 }
-                else if (rollIndex < frameStart + 2)
+                else if (rollTimes <= frameStart + 1)
                 {
-                    rollIndex++;
+                    rollTimes++;
                 }
                 else
                 {
                     throw new InvalidOperationException();
                 }
             }
+        }
+
+        public int GetScores()
+        {
+            int scores = 0;
+            for (int boardIndex = 0, frame = 1; frame <= NUM_OF_FRAME; frame++)
+            {
+                int rollInFrame = 2;
+                if (IsStrike(boardIndex))
+                {
+                    int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
+                    scores += scoreBoard[boardIndex] + bonus;
+                    rollInFrame = 1;
+                }
+                else if (IsSpare(boardIndex))
+                {
+                    int bonus = scoreBoard[boardIndex + 2];
+                    scores += GetStandardScores(boardIndex) + scoreBoard[boardIndex + 2];
+                }
+                else
+                {
+                    scores += GetStandardScores(boardIndex);
+                }
+                boardIndex += rollInFrame;
+            }
+            return scores;
+        }
+
+        private int GetStandardScores(int boardIndex)
+        {
+            return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1];
+        }
+
+        private bool IsSpare(int boardIndex)
+        {
+            return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] == 10;
+        }
+
+        private bool IsStrike(int boardIndex)
+        {
+            return scoreBoard[boardIndex] == 10;
         }
     }
 }
