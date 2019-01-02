@@ -4,21 +4,21 @@ namespace Kata
 {
     public class Bowling
     {
-        private readonly int NUM_OF_PINS = 10;
         private readonly int NUM_OF_FRAME = 10;
+        private readonly int NUM_OF_PINS = 10;
         private int[] scoreBoard = new int[22];
-        private int rollTimes;
+        private int rollIndex;
         private int frameStart;
         private int frame = 1;
 
         public void Roll(int pins)
         {
-            PinValidation(pins);
-            scoreBoard[rollTimes++] = pins;
-            SummaryFrame(pins);
+            ArgumentValidation(pins);
+            scoreBoard[rollIndex++] = pins;
+            SummarizeFrame(pins);
         }
 
-        private void PinValidation(int pins)
+        private void ArgumentValidation(int pins)
         {
             if (pins > NUM_OF_PINS)
             {
@@ -26,11 +26,12 @@ namespace Kata
             }
         }
 
-        private void SummaryFrame(int pins)
+        private void SummarizeFrame(int pins)
         {
-            if (frame < NUM_OF_FRAME)
+            bool isLastFrame = frame == NUM_OF_FRAME;
+            if (!isLastFrame)
             {
-                NormalSummary(pins);
+                SummarizeNormalFrame(pins);
             }
             else
             {
@@ -41,34 +42,25 @@ namespace Kata
             }
         }
 
-        private void NormalSummary(int pins)
+        private void SummarizeNormalFrame(int pins)
         {
             if (GetNormalScores(frameStart) > NUM_OF_PINS)
             {
                 throw new InvalidOperationException();
             }
-            if (pins == 10 || rollTimes > frameStart + 1)
+            bool isFrameFinished = pins == 10 || rollIndex > frameStart + 1;
+            if (isFrameFinished)
             {
-                frameStart = rollTimes;
+                frameStart = rollIndex;
                 frame++;
             }
         }
 
         private bool IsValidRollInLastFrame()
         {
-            if (IsStrike(frameStart) && rollTimes <= frameStart + 3)
-            {
-                return true;
-            }
-            else if (IsSpare(frameStart) && rollTimes <= frameStart + 3)
-            {
-                return true;
-            }
-            else if (rollTimes <= frameStart + 2)
-            {
-                return true;
-            }
-            return false;
+            return (IsStrike(frameStart) && rollIndex <= frameStart + 3) ||
+                   (IsSpare(frameStart) && rollIndex <= frameStart + 3) ||
+                   rollIndex <= frameStart + 2;
         }
 
         public int GetScores()
@@ -76,12 +68,12 @@ namespace Kata
             int scores = 0;
             for (int boardIndex = 0, frame = 1; frame <= NUM_OF_FRAME; frame++)
             {
-                int rollInFrame = 2;
+                int rollTimes = 2;
                 if (IsStrike(boardIndex))
                 {
                     int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
                     scores += NUM_OF_PINS + bonus;
-                    rollInFrame = 1;
+                    rollTimes = 1;
                 }
                 else if (IsSpare(boardIndex))
                 {
@@ -92,7 +84,7 @@ namespace Kata
                 {
                     scores += GetNormalScores(boardIndex);
                 }
-                boardIndex += rollInFrame;
+                boardIndex += rollTimes;
             }
             return scores;
         }

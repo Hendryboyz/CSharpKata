@@ -14,7 +14,7 @@ namespace Kata.Tests
             game = new Bowling();
             Assert.NotNull(game);
         }
-
+        
         [Test]
         public void CanRoll()
         {
@@ -44,53 +44,53 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenSpare_WhenRoll_ThenReturnCorrectScores()
+        public void GivenSpare_WhenRoll_ThenGetCorrectScores()
         {
-            game.Roll(3);
-            game.Roll(7);
-            game.Roll(5);
+            game.Roll(9);
+            game.Roll(1);
+            game.Roll(9);
             RollMany(17, 0);
-            AssertScores(20);
+            AssertScores(28);
         }
 
         [Test]
-        public void GivenStrike_WhenRoll_ThenReturnCorrectScores()
+        public void GivenStrike_WhenRoll_ThenGetCorrectScores()
         {
             game.Roll(10);
-            game.Roll(2);
-            game.Roll(7);
+            game.Roll(8);
+            game.Roll(1);
             RollMany(16, 0);
             AssertScores(28);
         }
 
         [Test]
-        public void Given12Stikes_WhenRoll_ThenReturn300Points()
+        public void Given12Strikes_WhenRoll_ThenGet300Points()
         {
             RollMany(12, 10);
             AssertScores(300);
         }
 
         [Test]
-        public void GivenMoreThan10Pin_WhenRoll_ThenThrowInvaidOperationException()
+        public void GivenMoreThan10Pins_WhenRoll_ThenThrowsInvalidOperationException()
         {
             Assert.Throws<InvalidOperationException>(() => game.Roll(11));
         }
 
         [Test]
-        public void GivenMoreThan10PinsInFrame_WhenRoll_ThenThrowInvalidOperationException()
+        public void GivenMoreThan10PinsInFrame_WhenRoll_ThenThrowsInvalidOperationException()
         {
-            game.Roll(2);
-            Assert.Throws<InvalidOperationException>(() => game.Roll(9));
+            game.Roll(3);
+            Assert.Throws<InvalidOperationException>(() => game.Roll(8));
         }
 
         [TestCase(12, 10)]
         [TestCase(20, 1)]
         [TestCase(21, 5)]
-        public void GivenMoreThan10Frame_WhenRoll_ThenThrowInvalidOperationException(
+        public void GivenMoreThan10Frames_WhenRoll_ThenThrowsInvalidOperationException(
             int rollTimes, int pins)
         {
             RollMany(rollTimes, pins);
-            Assert.Throws<InvalidOperationException>(() => game.Roll(9));
+            Assert.Throws<InvalidOperationException>(() => game.Roll(8));
         }
     }
 }
