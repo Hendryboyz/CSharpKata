@@ -13,12 +13,12 @@ namespace Kata
 
         public void Roll(int pins)
         {
-            ArgumentValidation(pins);
+            RollValidation(pins);
             scoreBoard[rollIndex++] = pins;
             SummarizeFrame(pins);
         }
 
-        private void ArgumentValidation(int pins)
+        private void RollValidation(int pins)
         {
             if (pins > NUM_OF_PINS)
             {
@@ -28,14 +28,13 @@ namespace Kata
 
         private void SummarizeFrame(int pins)
         {
-            bool isLastFrame = frame == NUM_OF_FRAME;
-            if (!isLastFrame)
+            if (frame < NUM_OF_FRAME)
             {
                 SummarizeNormalFrame(pins);
             }
             else
             {
-                if (!IsValidRollInLastFrame())
+                if (!IsValidLastFrameRoll())
                 {
                     throw new InvalidOperationException();
                 }
@@ -44,23 +43,35 @@ namespace Kata
 
         private void SummarizeNormalFrame(int pins)
         {
-            if (GetNormalScores(frameStart) > NUM_OF_PINS)
+            if (scoreBoard[frameStart] + scoreBoard[frameStart + 1] > 10)
             {
                 throw new InvalidOperationException();
             }
-            bool isFrameFinished = pins == 10 || rollIndex > frameStart + 1;
-            if (isFrameFinished)
+            if (pins == 10 || rollIndex > frameStart + 1)
             {
                 frameStart = rollIndex;
                 frame++;
             }
         }
 
-        private bool IsValidRollInLastFrame()
+        private bool IsValidLastFrameRoll()
         {
-            return (IsStrike(frameStart) && rollIndex <= frameStart + 3) ||
-                   (IsSpare(frameStart) && rollIndex <= frameStart + 3) ||
-                   rollIndex <= frameStart + 2;
+            if (IsStrike(frameStart) && rollIndex <= frameStart + 3)
+            {
+                return true;
+            }
+            else if (IsSpare(frameStart) && rollIndex <= frameStart + 3)
+            {
+                return true;
+            }
+            else if (rollIndex <= frameStart + 2)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public int GetScores()
@@ -71,27 +82,32 @@ namespace Kata
                 int rollTimes = 2;
                 if (IsStrike(boardIndex))
                 {
-                    int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
-                    scores += NUM_OF_PINS + bonus;
+                    scores += GetStrikeScores(boardIndex);
                     rollTimes = 1;
                 }
                 else if (IsSpare(boardIndex))
                 {
-                    int bonus = scoreBoard[boardIndex + 2];
-                    scores += NUM_OF_PINS + bonus;
+                    scores += GetSpareScores(boardIndex);
                 }
                 else
                 {
-                    scores += GetNormalScores(boardIndex);
+                    scores += GetFrameScores(boardIndex);
                 }
                 boardIndex += rollTimes;
             }
             return scores;
         }
 
+
         private bool IsStrike(int boardIndex)
         {
             return scoreBoard[boardIndex] == NUM_OF_PINS;
+        }
+
+        private int GetStrikeScores(int boardIndex)
+        {
+            int bonus = scoreBoard[boardIndex + 1] + scoreBoard[boardIndex + 2];
+            return NUM_OF_PINS + bonus;
         }
 
         private bool IsSpare(int boardIndex)
@@ -99,7 +115,13 @@ namespace Kata
             return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1] == NUM_OF_PINS;
         }
 
-        private int GetNormalScores(int boardIndex)
+        private int GetSpareScores(int boardIndex)
+        {
+            int bonus = scoreBoard[boardIndex + 2];
+            return GetFrameScores(boardIndex) + bonus;
+        }
+
+        private int GetFrameScores(int boardIndex)
         {
             return scoreBoard[boardIndex] + scoreBoard[boardIndex + 1];
         }
