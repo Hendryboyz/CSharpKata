@@ -46,21 +46,21 @@ namespace Kata.Tests
         [Test]
         public void GivenSpare_WhenRoll_ThenReturnCorrectScores()
         {
-            game.Roll(3);
-            game.Roll(7);
+            game.Roll(1);
             game.Roll(9);
+            game.Roll(5);
             RollMany(17, 0);
-            AssertScores(28);
+            AssertScores(20);
         }
 
         [Test]
-        public void GivenStike_WhenRoll_ThenReturnCorrectScores()
+        public void GivenStrike_WhenRoll_ThenReturnCorrectScores()
         {
             game.Roll(10);
-            game.Roll(5);
             game.Roll(3);
+            game.Roll(6);
             RollMany(16, 0);
-            AssertScores(26);
+            AssertScores(28);
         }
 
         [Test]
@@ -71,13 +71,13 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenMoreThanPins_WhenRoll_ThrowInvalidOperationExcetpion()
+        public void GivenMoreThan10Pins_WhenRoll_ThenThrowInvalidOperationException()
         {
             Assert.Throws<InvalidOperationException>(() => game.Roll(11));
         }
 
         [Test]
-        public void GivenMoreThanPinsInFrame_WhenRoll_ThrowInvalidOperationException()
+        public void GivenMoreThan10PinsInFrame_WhenRoll_ThenThrowInvalidOperationException()
         {
             game.Roll(2);
             Assert.Throws<InvalidOperationException>(() => game.Roll(9));
@@ -86,7 +86,7 @@ namespace Kata.Tests
         [TestCase(12, 10)]
         [TestCase(21, 5)]
         [TestCase(20, 1)]
-        public void GivenMoreThan10Frames_WhenRoll_ThrowInvalidOperationException(
+        public void GivenMoreThan10Frames_WhenRoll_ThenThrowInvalidOperationException(
             int rollTimes, int pins)
         {
             RollMany(rollTimes, pins);
