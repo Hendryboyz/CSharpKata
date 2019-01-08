@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Kata
 {
@@ -8,59 +6,57 @@ namespace Kata
     // Solution : https://github.com/unclebob/rubyargs/tree/master
     public class Args
     {
-        private IList<string> _results;
-        private string[] _args;
+        private IDictionary<string, object> result;
+        private IDictionary<string, IMarshaler> marshalers;
 
-        public Args()
+        public IDictionary<string, object> Parse(ArgSpec[] argSpecs, string args)
         {
-            _results = new List<string>();
-        }
-
-        public string[] Parse(string[] args)
-        {
-            _args = args;
-            for (int argumentsIndex = 0; argumentsIndex < _args.Length;)
+            result = new Dictionary<string, object>();
+            marshalers = new Dictionary<string, IMarshaler>();
+            foreach (ArgSpec spec in argSpecs)
             {
-                ParseFlag(argumentsIndex);
-                argumentsIndex++;
+                result.Add(spec.Flag, spec.Default);
+                BuildMarshalers(spec);
             }
-            return _results.ToArray();
+            DoParse(args);
+            return result;
         }
 
-        private void ParseFlag(int argumentsIndex)
+        private void BuildMarshalers(ArgSpec spec)
         {
-            bool isFlag = _args[argumentsIndex].ElementAt(0) == '-';
-            if (isFlag)
+            if (spec.Type == typeof(bool))
             {
-                char flag = _args[argumentsIndex].ElementAt(1);
-                switch (flag)
+                marshalers.Add(spec.Flag, new BooleanMarshaler(spec));
+            }
+            else if (spec.Type == typeof(string))
+            {
+                marshalers.Add(spec.Flag, new StringMarshaler(spec));
+            }
+        }
+
+        private void DoParse(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                return;
+            }
+            IList<string> argList = new List<string>(args.Split(" "));
+            IEnumerator<string> argEnumerable = argList.GetEnumerator();
+            while(argEnumerable.MoveNext())
+            {
+                string eachArg = argEnumerable.Current;
+                bool isFlag = eachArg.Substring(0, 1) == "-";
+                if (isFlag)
                 {
-                    case 'p':
-                        ParseFlagWithValue(argumentsIndex, "8080");
-                        break;
-                    case 'l':
-                        _results.Add(Convert.ToString(true));
-                        break;
-                    case 'd':
-                        ParseFlagWithValue(argumentsIndex, "/var/logs");
-                        break;
-                    default:
-                        _results.Add("Not Support Flag");
-                        break;
+                    result[eachArg.Substring(1)] = 
+                        GetFlagValue(eachArg.Substring(1), argEnumerable);
                 }
             }
         }
 
-        private void ParseFlagWithValue(int argumentsIndex, string defaultValue)
+        private object GetFlagValue(string eachArg, IEnumerator<string> argEnumerable)
         {
-            if (argumentsIndex < _args.Length - 1 && _args[argumentsIndex + 1][0] != '-')
-            {
-                _results.Add(_args[argumentsIndex + 1]);
-            }
-            else
-            {
-                _results.Add(defaultValue);
-            }
+            return marshalers[eachArg].GetValue(argEnumerable);
         }
     }
 }

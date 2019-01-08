@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace Kata.Tests
 {
@@ -16,39 +17,48 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenBoolFlag_WhenParse_ThenReturnTrue()
+        public void CanParse()
         {
-            string[] result = args.Parse(new string[] { "-l" });
-            Assert.AreEqual(new string[] { Convert.ToString(true) }, result);
+            ArgSpec spec = new ArgSpec()
+            {
+                Flag = "l",
+                Type = typeof(bool),
+                Default = false,
+            };
+            IDictionary<string, object> result = args.Parse(new ArgSpec[] { spec }, "");
+            Assert.IsTrue(result.ContainsKey("l"));
+            Assert.IsInstanceOf<bool>(result["l"]);
+            bool isLogging = (bool)result["l"];
+            Assert.IsFalse(isLogging);
         }
 
         [Test]
-        public void GivenFlagIntArgument_WhenParse_ThenReturnInteger()
+        public void GivenStringAndBoolSpec_WhenParse_ResultContains()
         {
-            string[] result = args.Parse(new string[] { "-p", "12314" });
-            Assert.AreEqual(new string[] { "12314" }, result);
+            ArgSpec boolSpec = new ArgSpec()
+            {
+                Flag = "l",
+                Type = typeof(bool),
+                Default = false,
+            };
+            ArgSpec stringSpec = new ArgSpec()
+            {
+                Flag = "d",
+                Type = typeof(string),
+                Default = "/var/log",
+            };
+            IDictionary<string, object> result = args.Parse(
+                new ArgSpec[] { boolSpec, stringSpec }, "-l -d /home/me/log");
+            Assert.IsTrue(result.ContainsKey("l"));
+            Assert.IsInstanceOf<bool>(result["l"]);
+            bool isLogging = (bool)result["l"];
+            Assert.IsTrue(isLogging);
+            Assert.IsTrue(result.ContainsKey("d"));
+            Assert.IsInstanceOf<string>(result["d"]);
+            Assert.AreEqual(result["d"], "/home/me/log");
         }
 
-        [Test]
-        public void GivenFlagButNotGiveArgument_WhenParse_ThenReturnDefault()
-        {
-            string[] result = args.Parse(new string[] { "-p" });
-            Assert.AreEqual(new string[] { "8080" }, result);
-        }
-
-        [Test]
-        public void GivenTwoFlagWithArgument_WhenParse_ThenReturnValues()
-        {
-            string[] result = args.Parse(new string[] { "-p", "8080", "-l" });
-            Assert.AreEqual(new string[] { "8080", Convert.ToString(true) }, result);
-        }
-
-        [Test]
-        public void GivenThreeFlagWithArgument_WhenParse_ThenReturnValues()
-        {
-            string[] result = args.Parse(new string[] { "-p", "8080", "-l", "-d", "/var/usr/logs" });
-            Assert.AreEqual(new string[] { "8080", Convert.ToString(true), "/var/usr/logs" }, result);
-        }
-
+        //[Test]
+        //public void GivenBooleanAndStringFlag_
     }
 }
