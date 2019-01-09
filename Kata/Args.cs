@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kata
 {
@@ -6,57 +7,48 @@ namespace Kata
     // Solution : https://github.com/unclebob/rubyargs/tree/master
     public class Args
     {
-        private IDictionary<string, object> result;
-        private IDictionary<string, IMarshaler> marshalers;
+        private ArgSpec[] _argSpec;
+        private IDictionary<string, IArgMarshaler> _argMarshalers;
+        private IDictionary<string, object> _results;
 
-        public IDictionary<string, object> Parse(ArgSpec[] argSpecs, string args)
-        {
-            result = new Dictionary<string, object>();
-            marshalers = new Dictionary<string, IMarshaler>();
-            foreach (ArgSpec spec in argSpecs)
-            {
-                result.Add(spec.Flag, spec.Default);
-                BuildMarshalers(spec);
-            }
-            DoParse(args);
-            return result;
-        }
 
-        private void BuildMarshalers(ArgSpec spec)
+        public Args()
+        { }
+
+        public Args(ArgSpec[] argSpec)
         {
-            if (spec.Type == typeof(bool))
+            _argSpec = argSpec;
+            _argMarshalers = new Dictionary<string, IArgMarshaler>();
+            _results = new Dictionary<string, object>();
+            foreach (var eachSpec in _argSpec)
             {
-                marshalers.Add(spec.Flag, new BooleanMarshaler(spec));
-            }
-            else if (spec.Type == typeof(string))
-            {
-                marshalers.Add(spec.Flag, new StringMarshaler(spec));
+                _argMarshalers.Add(eachSpec.Flag, ArgMarshalerFactory.GetMarshaler(eachSpec));
+                _results.Add(eachSpec.Flag, eachSpec.Default);
             }
         }
 
-        private void DoParse(string args)
+        public IDictionary<string, object> Parse(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
-                return;
+                return _results;
             }
-            IList<string> argList = new List<string>(args.Split(" "));
-            IEnumerator<string> argEnumerable = argList.GetEnumerator();
-            while(argEnumerable.MoveNext())
+            IEnumerator<string> argEnumerator = new List<string>(args.Split(" ")).GetEnumerator();
+            while (argEnumerator.MoveNext())
             {
-                string eachArg = argEnumerable.Current;
-                bool isFlag = eachArg.Substring(0, 1) == "-";
-                if (isFlag)
+                string eachArg = argEnumerator.Current;
+                if (IsFlag(eachArg))
                 {
-                    result[eachArg.Substring(1)] = 
-                        GetFlagValue(eachArg.Substring(1), argEnumerable);
+                    string flag = eachArg.Substring(1);
+                    _results[flag] = _argMarshalers[flag].GetValue(argEnumerator);
                 }
             }
+            return _results;
         }
 
-        private object GetFlagValue(string eachArg, IEnumerator<string> argEnumerable)
+        private bool IsFlag(string arg)
         {
-            return marshalers[eachArg].GetValue(argEnumerable);
+            return arg.Substring(0, 1) == "-";
         }
     }
 }
