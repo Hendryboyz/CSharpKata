@@ -7,21 +7,41 @@ namespace Kata.Tests
     [TestFixture]
     public class ArgsTests
     {
-
         [Test]
-        public void CanNewArgs()
+        public void CanCreate()
         {
             Args args = new Args();
             Assert.NotNull(args);
         }
 
         [Test]
-        public void CanGivenArgsSpecs()
+        public void CanGivenSpec()
         {
-            ArgSpec spec = GetBoolSpec("l", false);
-
+            ArgSpec spec = new ArgSpec()
+            {
+                Flag = "l",
+                Type = typeof(bool),
+                Default = false
+            };
             Args args = new Args(new ArgSpec[] { spec });
             Assert.NotNull(args);
+        }
+
+        [Test]
+        public void GivenBoolSpecAndArg_WhenParse_ThenReturnFlagAndTrue()
+        {
+            ArgSpec boolSpec = GetBoolSpec("l", false);
+            Args args = new Args(new ArgSpec[] { boolSpec });
+            IDictionary<string, object> results = args.Parse("-l");
+            AssertBoolArg(results, boolSpec.Flag, true);
+        }
+
+        private void AssertBoolArg(
+            IDictionary<string, object> results, string flag, bool expected)
+        {
+            Assert.IsTrue(results.ContainsKey(flag));
+            Assert.IsInstanceOf<bool>(results[flag]);
+            Assert.IsTrue((bool)results[flag] == expected);
         }
 
         private ArgSpec GetBoolSpec(string flag, bool defaultValue)
@@ -35,49 +55,54 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenBooleanSpecAndArg_WhenParse_ReturnTrue()
+        public void GivenBoolSpecWithoutArg_WhenParse_ThenReturnFlagAndFalse()
         {
             ArgSpec boolSpec = GetBoolSpec("l", false);
             Args args = new Args(new ArgSpec[] { boolSpec });
-
-            IDictionary<string, object> results = args.Parse("-l");
-
-            AssertBoolArgs(results, "l", true);
+            IDictionary<string, object> results = args.Parse("");
+            AssertBoolArg(results, boolSpec.Flag, false);
         }
 
-        private void AssertBoolArgs(IDictionary<string, object> results, string flag, bool expected)
+        [Test]
+        public void GivenIntSpecAndArg_WhenParse_ThenReturnFlagAndInt()
+        {
+            ArgSpec intSpec = GetIntSpec("p", 8080);
+            Args args = new Args(new ArgSpec[] { intSpec });
+            IDictionary<string, object> results = args.Parse("-p 1231");
+            AssertIntArg(results, intSpec.Flag, 1231);
+        }
+
+        private void AssertIntArg(IDictionary<string, object> results, string flag, int expected)
         {
             Assert.IsTrue(results.ContainsKey(flag));
-            Assert.IsInstanceOf<bool>(results[flag]);
-            Assert.IsTrue(expected == (bool)results["l"]);
+            Assert.IsInstanceOf<int>(results[flag]);
+            Assert.IsTrue((int)results[flag] == expected);
         }
 
-        [Test]
-        public void GivenBooleanSpecWithoutArg_WhenParse_ReturnFalse()
+        private ArgSpec GetIntSpec(string flag, int defaultValue)
         {
-            ArgSpec boolSpec = GetBoolSpec("l", false);
-            Args args = new Args(new ArgSpec[] { boolSpec });
-
-            IDictionary<string, object> results = args.Parse("");
-
-            AssertBoolArgs(results, "l", false);
+            return new ArgSpec()
+            {
+                Flag = flag,
+                Type = typeof(int),
+                Default = defaultValue
+            };
         }
 
         [Test]
-        public void GivenStringSpecAndArg_WhenParse_ReturnValue()
+        public void GivenStringSpecAndArg_WhenParse_ThenReturnFlagAndString()
         {
             ArgSpec stringSpec = GetStringSpec("d", "/var/log");
             Args args = new Args(new ArgSpec[] { stringSpec });
-
             IDictionary<string, object> results = args.Parse("-d /home/user/log");
-            AssertStringArgs(results, "d", "/home/user/log");
+            AssertStringArg(results, stringSpec.Flag, "/home/user/log");
         }
 
-        private void AssertStringArgs(IDictionary<string, object> results, string flag, string defaultValue)
+        private void AssertStringArg(IDictionary<string, object> results, string flag, string expected)
         {
             Assert.IsTrue(results.ContainsKey(flag));
             Assert.IsInstanceOf<string>(results[flag]);
-            Assert.AreEqual(defaultValue, (string)results[flag]);
+            Assert.IsTrue((string)results[flag] == expected);
         }
 
         private ArgSpec GetStringSpec(string flag, string defaultValue)
@@ -91,54 +116,26 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenMultiSpecsButNothingArg_WhenParse_ReturnDefaultValue()
+        public void GivenMultiSpecAndArg_WhenParse_ThenReturnFlagAndString()
         {
-            ArgSpec boolSpec = GetBoolSpec("l", false);
             ArgSpec stringSpec = GetStringSpec("d", "/var/log");
-            Args args = new Args(new ArgSpec[] { boolSpec, stringSpec });
-
-            IDictionary<string, object> results = args.Parse("");
-            AssertStringArgs(results, "d", "/var/log");
-            AssertBoolArgs(results, "l", false);
+            ArgSpec intSpec = GetIntSpec("p", 8080);
+            ArgSpec boolSpec = GetBoolSpec("l", false);
+            Args args = new Args(new ArgSpec[] { boolSpec, intSpec, stringSpec });
+            IDictionary<string, object> results = args.Parse("-p 12314 -l -d /home/user/log");
+            AssertStringArg(results, stringSpec.Flag, "/home/user/log");
+            AssertIntArg(results, intSpec.Flag, 12314);
+            AssertBoolArg(results, boolSpec.Flag, true);
         }
 
         [Test]
-        public void GivenIntegerSpecAndArg_WhenParse_ReturnDefaultValue()
+        public void GivenNotExistingArg_WhenParse_ThenThrowInvalidOperationException()
         {
-            ArgSpec intSpec = GetIntegerSpec("p", 80);
-            Args args = new Args(new ArgSpec[] { intSpec });
-
-            IDictionary<string, object> results = args.Parse("-p 8080");
-
-            AssertIntArgs(results, "p", 8080);
-        }
-
-        private ArgSpec GetIntegerSpec(string flag, int defaultValue)
-        {
-            return new ArgSpec()
-            {
-                Flag = flag,
-                Type = typeof(int),
-                Default = defaultValue
-            };
-        }
-
-        private void AssertIntArgs(IDictionary<string, object> results, string flag, int defaultValue)
-        {
-            Assert.IsTrue(results.ContainsKey(flag));
-            Assert.IsInstanceOf<int>(results[flag]);
-            Assert.AreEqual(defaultValue, (int)results[flag]);
-        }
-
-        [Test]
-        public void GivenAnotherIntSpecAndArg_WhenParse_ReturnDefaultValue()
-        {
-            ArgSpec intSpec = GetIntegerSpec("a", 18);
-            Args args = new Args(new ArgSpec[] { intSpec });
-
-            IDictionary<string, object> results = args.Parse("-a 26");
-
-            AssertIntArgs(results, "a", 26);
+            ArgSpec stringSpec = GetStringSpec("d", "/var/log");
+            ArgSpec intSpec = GetIntSpec("p", 8080);
+            ArgSpec boolSpec = GetBoolSpec("l", false);
+            Args args = new Args(new ArgSpec[] { boolSpec, intSpec, stringSpec });
+            Assert.Throws<InvalidOperationException>(() =>args.Parse("-s hello"));
         }
     }
 }

@@ -12,11 +12,15 @@ namespace Kata
             _eachSpec = eachSpec;
         }
 
-        public object GetValue(IEnumerator<string> argEnumerator)
+        public object GetValue(IEnumerator<string> argsEnumerator)
         {
-            if (argEnumerator.MoveNext() && !IsFlag(argEnumerator.Current))
+            if (argsEnumerator.MoveNext())
             {
-                return Convert.ToInt32(argEnumerator.Current);
+                string valueArg = argsEnumerator.Current;
+                if (!IsFlag(valueArg))
+                {
+                    return Convert.ToInt32(valueArg);
+                }
             }
             return Convert.ToInt32(_eachSpec.Default);
         }

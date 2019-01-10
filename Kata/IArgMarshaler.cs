@@ -4,6 +4,6 @@ namespace Kata
 {
     public interface IArgMarshaler
     {
-        object GetValue(IEnumerator<string> argEnumerator);
+        object GetValue(IEnumerator<string> argsEnumerator);
     }
 }

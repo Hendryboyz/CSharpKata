@@ -7,22 +7,23 @@ namespace Kata
     // Solution : https://github.com/unclebob/rubyargs/tree/master
     public class Args
     {
-        private ArgSpec[] _argSpec;
-        private IDictionary<string, IArgMarshaler> _argMarshalers;
-        private IDictionary<string, object> _results;
-
+        private ArgSpec[] argSpec;
+        IDictionary<string, object> _results;
+        IDictionary<string, IArgMarshaler> _marshalers;
 
         public Args()
-        { }
+        {
+
+        }
 
         public Args(ArgSpec[] argSpec)
         {
-            _argSpec = argSpec;
-            _argMarshalers = new Dictionary<string, IArgMarshaler>();
+            this.argSpec = argSpec;
             _results = new Dictionary<string, object>();
-            foreach (var eachSpec in _argSpec)
+            _marshalers = new Dictionary<string, IArgMarshaler>();
+            foreach (ArgSpec eachSpec in argSpec)
             {
-                _argMarshalers.Add(eachSpec.Flag, ArgMarshalerFactory.GetMarshaler(eachSpec));
+                _marshalers.Add(eachSpec.Flag, MarshalerFactory.Get(eachSpec));
                 _results.Add(eachSpec.Flag, eachSpec.Default);
             }
         }
@@ -33,17 +34,29 @@ namespace Kata
             {
                 return _results;
             }
-            IEnumerator<string> argEnumerator = new List<string>(args.Split(" ")).GetEnumerator();
-            while (argEnumerator.MoveNext())
+            IEnumerator<string> argsEnumerator = new List<string>(args.Split(" ")).GetEnumerator();
+            while(argsEnumerator.MoveNext())
             {
-                string eachArg = argEnumerator.Current;
-                if (IsFlag(eachArg))
-                {
-                    string flag = eachArg.Substring(1);
-                    _results[flag] = _argMarshalers[flag].GetValue(argEnumerator);
-                }
+                ParseEachArg(argsEnumerator);
             }
             return _results;
+        }
+
+        private void ParseEachArg(IEnumerator<string> argsEnumerator)
+        {
+            string curArg = argsEnumerator.Current;
+            if (IsFlag(curArg))
+            {
+                string flag = curArg.Substring(1);
+                if (_marshalers.ContainsKey(flag))
+                {
+                    _results[flag] = _marshalers[flag].GetValue(argsEnumerator);
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
         }
 
         private bool IsFlag(string arg)

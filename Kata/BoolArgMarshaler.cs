@@ -11,7 +11,7 @@ namespace Kata
             _eachSpec = eachSpec;
         }
 
-        public object GetValue(IEnumerator<string> argEnumerator)
+        public object GetValue(IEnumerator<string> argsEnumerator)
         {
             return true;
         }

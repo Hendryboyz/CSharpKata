@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kata
 {
-    public class StringArgMarshaler : IArgMarshaler
+    internal class StringArgMarshaler : IArgMarshaler
     {
         private ArgSpec _eachSpec;
 
@@ -11,13 +12,17 @@ namespace Kata
             _eachSpec = eachSpec;
         }
 
-        public object GetValue(IEnumerator<string> argEnumerator)
+        public object GetValue(IEnumerator<string> argsEnumerator)
         {
-            if (argEnumerator.MoveNext() && !IsFlag(argEnumerator.Current))
+            if (argsEnumerator.MoveNext())
             {
-                return argEnumerator.Current;
+                string valueArg = argsEnumerator.Current;
+                if (!IsFlag(valueArg))
+                {
+                    return valueArg;
+                }
             }
-            return _eachSpec.Default;
+            return Convert.ToString(_eachSpec.Default);
         }
 
         private bool IsFlag(string arg)
