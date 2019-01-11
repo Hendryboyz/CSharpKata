@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Kata
 {
@@ -8,7 +7,7 @@ namespace Kata
     public class Args
     {
         private IDictionary<string, object> results;
-        private IDictionary<string, Type> argTypes;
+        private IDictionary<string, IArgMarshaler> marshalers;
 
         public Args()
         {
@@ -18,10 +17,10 @@ namespace Kata
         public Args(ArgSpec[] argSpecs)
         {
             results = new Dictionary<string, object>();
-            argTypes = new Dictionary<string, Type>();
+            marshalers = new Dictionary<string, IArgMarshaler>();
             foreach (ArgSpec spec in argSpecs)
             {
-                argTypes.Add(spec.Flag, spec.Type);
+                marshalers.Add(spec.Flag, MarshalerFactory.Get(spec));
                 results.Add(spec.Flag, spec.Default);
             }
         }
@@ -40,42 +39,10 @@ namespace Kata
                 if (IsFlag(curArg))
                 {
                     string flag = curArg.Substring(1);
-                    if (argTypes.ContainsKey(flag))
-                    {
-                        if (argTypes[flag] == typeof(bool))
-                        {
-                            results[flag] = true;
-                        }
-                        else if (argTypes[flag] == typeof(string))
-                        {
-                            if (IsContainsValue(argEnumerator, flag))
-                            {
-                                results[flag] = Convert.ToString(argEnumerator.Current);
-                            }
-                        }
-                        else if (argTypes[flag] == typeof(int))
-                        {
-                            if (IsContainsValue(argEnumerator, flag))
-                            {
-                                results[flag] = Convert.ToInt32(argEnumerator.Current);
-                            }
-                        }
-                    }
+                    results[flag] = marshalers[flag].GetValue(argEnumerator);
                 }
             }
             return results;
-        }
-
-        private bool IsContainsValue(IEnumerator<string> argEnumerator, string flag)
-        {
-            if (argEnumerator.MoveNext() && !IsFlag(argEnumerator.Current))
-            {
-                return true;
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
         }
 
         private bool IsFlag(string arg)

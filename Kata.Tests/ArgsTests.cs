@@ -125,5 +125,18 @@ namespace Kata.Tests
             Assert.IsInstanceOf<int>(results[flag]);
             Assert.AreEqual((int)results[flag], expected);
         }
+
+        [Test]
+        public void GivenMultiSpecAndArgs_WhenParse_ThenReturnFlagAndValue()
+        {
+            ArgSpec intSpec = GetIntSpec("p", 8080);
+            ArgSpec boolSpec = GetBoolSpec("l", false);
+            ArgSpec stringSpec = GetStringSpec("d", "/var/log");
+            Args args = new Args(new ArgSpec[] { stringSpec, boolSpec, intSpec });
+            IDictionary<string, object> results = args.Parse("-l -d /home/user/log -p 1234");
+            AssertInt(results, intSpec.Flag, 1234);
+            AssertString(results, stringSpec.Flag, "/home/user/log");
+            AssertBool(results, boolSpec.Flag, true);
+        }
     }
 }
