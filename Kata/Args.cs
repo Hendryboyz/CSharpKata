@@ -7,24 +7,22 @@ namespace Kata
     // Solution : https://github.com/unclebob/rubyargs/tree/master
     public class Args
     {
-        private ArgSpec[] argSpec;
-        IDictionary<string, object> _results;
-        IDictionary<string, IArgMarshaler> _marshalers;
+        private IDictionary<string, object> results;
+        private IDictionary<string, Type> argTypes;
 
         public Args()
         {
 
         }
 
-        public Args(ArgSpec[] argSpec)
+        public Args(ArgSpec[] argSpecs)
         {
-            this.argSpec = argSpec;
-            _results = new Dictionary<string, object>();
-            _marshalers = new Dictionary<string, IArgMarshaler>();
-            foreach (ArgSpec eachSpec in argSpec)
+            results = new Dictionary<string, object>();
+            argTypes = new Dictionary<string, Type>();
+            foreach (ArgSpec spec in argSpecs)
             {
-                _marshalers.Add(eachSpec.Flag, MarshalerFactory.Get(eachSpec));
-                _results.Add(eachSpec.Flag, eachSpec.Default);
+                argTypes.Add(spec.Flag, spec.Type);
+                results.Add(spec.Flag, spec.Default);
             }
         }
 
@@ -32,30 +30,51 @@ namespace Kata
         {
             if (string.IsNullOrEmpty(args))
             {
-                return _results;
+                return results;
             }
-            IEnumerator<string> argsEnumerator = new List<string>(args.Split(" ")).GetEnumerator();
-            while(argsEnumerator.MoveNext())
+            IEnumerator<string> argEnumerator = 
+                new List<string>(args.Split(" ")).GetEnumerator();
+            while(argEnumerator.MoveNext())
             {
-                ParseEachArg(argsEnumerator);
+                string curArg = argEnumerator.Current;
+                if (IsFlag(curArg))
+                {
+                    string flag = curArg.Substring(1);
+                    if (argTypes.ContainsKey(flag))
+                    {
+                        if (argTypes[flag] == typeof(bool))
+                        {
+                            results[flag] = true;
+                        }
+                        else if (argTypes[flag] == typeof(string))
+                        {
+                            if (IsContainsValue(argEnumerator, flag))
+                            {
+                                results[flag] = Convert.ToString(argEnumerator.Current);
+                            }
+                        }
+                        else if (argTypes[flag] == typeof(int))
+                        {
+                            if (IsContainsValue(argEnumerator, flag))
+                            {
+                                results[flag] = Convert.ToInt32(argEnumerator.Current);
+                            }
+                        }
+                    }
+                }
             }
-            return _results;
+            return results;
         }
 
-        private void ParseEachArg(IEnumerator<string> argsEnumerator)
+        private bool IsContainsValue(IEnumerator<string> argEnumerator, string flag)
         {
-            string curArg = argsEnumerator.Current;
-            if (IsFlag(curArg))
+            if (argEnumerator.MoveNext() && !IsFlag(argEnumerator.Current))
             {
-                string flag = curArg.Substring(1);
-                if (_marshalers.ContainsKey(flag))
-                {
-                    _results[flag] = _marshalers[flag].GetValue(argsEnumerator);
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
+                return true;
+            }
+            else
+            {
+                throw new ArgumentException();
             }
         }
 
