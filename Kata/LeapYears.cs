@@ -4,19 +4,16 @@
     {
         public bool Verify(int year)
         {
-            if (year % 400 == 0)
-            {
-                return true;
-            }
             if (year % 100 == 0)
             {
-                return false;
+                return IsDivisibleBy4(year / 100);
             }
-            if (year % 4 == 0)
-            {
-                return true;
-            }
-            return false;
+            return IsDivisibleBy4(year);
+        }
+
+        private bool IsDivisibleBy4(int year)
+        {
+            return (year & 3) == 0;
         }
     }
 }
