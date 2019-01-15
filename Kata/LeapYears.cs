@@ -1,14 +1,21 @@
 ﻿namespace Kata
 {
-    public class LeapYears
+    // http://codingdojo.org/kata/LeapYears/
+    public class LeapYear
     {
         public bool Verify(int year)
         {
-            if (year % 100 == 0)
+            bool isDivisibleBy100 = year % 100 == 0;
+            if (isDivisibleBy100)
             {
-                return IsDivisibleBy4(year / 100);
+                return IsDivisibleBy400(year);
             }
             return IsDivisibleBy4(year);
+        }
+
+        private bool IsDivisibleBy400(int year)
+        {
+            return IsDivisibleBy4(year / 100);
         }
 
         private bool IsDivisibleBy4(int year)

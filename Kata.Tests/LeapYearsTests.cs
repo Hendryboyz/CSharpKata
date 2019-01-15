@@ -5,58 +5,67 @@ namespace Kata.Tests
     [TestFixture]
     public class LeapYearsTests
     {
-        private LeapYears leapYears;
+        private LeapYear leapYear;
+
+        [Test]
+        public void CanSetUp()
+        {
+            leapYear = new LeapYear();
+            Assert.NotNull(leapYear);
+        }
 
         [SetUp]
         public void SetUp()
         {
-            leapYears = new LeapYears();
-            Assert.NotNull(leapYears);
+            CanSetUp();
         }
 
         [TestCase(400)]
         [TestCase(800)]
         [TestCase(1200)]
-        [TestCase(1600)]
         [TestCase(2000)]
-        public void GivenYearDivisibleBy400_ThenVerify_ReturnTrue(int year)
+        public void GivenYearDivisibleBy400_WhenVerify_ThenReturnIsLeapYear(int year)
         {
-            bool isLeap = leapYears.Verify(year);
+            AssertLeapYear(year);
+        }
+
+        private void AssertLeapYear(int year)
+        {
+            bool isLeap = leapYear.Verify(year);
             Assert.IsTrue(isLeap);
         }
 
         [TestCase(100)]
-        [TestCase(1700)]
-        [TestCase(1800)]
+        [TestCase(1900)]
         [TestCase(2100)]
         [TestCase(1500)]
-        public void GivenYearDivisibleBy100ButNotBy400_ThenVerify_ReturnFalse(int year)
+        public void GivenYearDivisibleBy100ButNotBy400_WhenVerify_ThenReturnNotLeapYear(int year)
         {
-            bool isLeap = leapYears.Verify(year);
+            AssertNotLeapYear(year);
+        }
+
+        private void AssertNotLeapYear(int year)
+        {
+            bool isLeap = leapYear.Verify(year);
             Assert.IsFalse(isLeap);
         }
 
         [TestCase(1992)]
-        [TestCase(4)]
-        [TestCase(216)]
         [TestCase(2016)]
-        [TestCase(2008)]
-        [TestCase(2012)]
-        public void GivenYearDivisibleBy4ButNotBy100_ThenVerify_ReturnTrue(int year)
+        [TestCase(2020)]
+        [TestCase(1936)]
+        public void GivenYearDivisibleBy4_WhenVerify_ThenReturnLeapYear(int year)
         {
-            bool isLeap = leapYears.Verify(year);
-            Assert.IsTrue(isLeap);
+            AssertLeapYear(year);
         }
 
-        [TestCase(5)]
-        [TestCase(2019)]
-        [TestCase(1995)]
         [TestCase(1949)]
-
-        public void GivenYearNotDivisibleBy4_ThenVerify_ReturnFalse(int year)
+        [TestCase(1919)]
+        [TestCase(1995)]
+        [TestCase(2019)]
+        public void GienYearNotDivisibleBy4_WhenVerify_ThenReturnNotLeapYear(int year)
         {
-            bool isLeap = leapYears.Verify(year);
-            Assert.IsFalse(isLeap);
+            AssertNotLeapYear(year);
         }
     }
 }
