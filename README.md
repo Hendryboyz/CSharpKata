@@ -10,4 +10,5 @@
  * [Bowling Game](http://codingdojo.org/kata/Bowling/) : an example from [Agile Principles, Patterns and Practices](https://www.amazon.com/gp/product/0131857258/ref=dbs_a_def_rwt_bibl_vppi_i5)
  * [Args](http://codingdojo.org/kata/Args/) : an example from [clean code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
  * [LeapYears](http://codingdojo.org/kata/LeapYears/)
+ * [FizzBuzz](http://codingdojo.org/kata/FizzBuzz/) : a case to practice decorator pattern
  * Next maybe Kata Potter
