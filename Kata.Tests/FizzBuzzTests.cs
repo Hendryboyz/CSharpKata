@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using NSubstitute;
+using NUnit.Framework;
 using System;
 
 namespace Kata.Tests
@@ -59,6 +60,18 @@ namespace Kata.Tests
         {
             string result = game.Given(number);
             StringAssert.AreEqualIgnoringCase("FizzBuzz", result);
+        }
+
+        [Test]
+        public void GivenNumber_ThenCheckConvertByNumberConverter()
+        {
+            INumberConverter numberConverter = Substitute.For<INumberConverter>();
+
+            game = new FizzBuzz(numberConverter);
+
+            string result = game.Given(1);
+
+            numberConverter.Received().Parse(Arg.Is(1));
         }
     }
 }
