@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using Kata.FizBuz;
+using NSubstitute;
 using NUnit.Framework;
 using System;
 
@@ -22,20 +23,20 @@ namespace Kata.Tests
             CanCreate();
         }
 
-        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(67)]
+        [TestCase(29)]
         [TestCase(7)]
-        [TestCase(11)]
-        [TestCase(97)]
-        public void GivenNumber_ThenReturnNumber(int number)
+        public void GivenNumber_ThenReturnNumberString(int number)
         {
             string result = game.Given(number);
             Assert.AreEqual(Convert.ToString(number), result);
         }
 
         [TestCase(3)]
-        [TestCase(6)]
+        [TestCase(24)]
         [TestCase(9)]
-        [TestCase(21)]
+        [TestCase(96)]
         public void GivenNumberDivisibleBy3_ThenReturnFizz(int number)
         {
             string result = game.Given(number);
@@ -43,9 +44,9 @@ namespace Kata.Tests
         }
 
         [TestCase(5)]
-        [TestCase(20)]
         [TestCase(25)]
-        [TestCase(10)]
+        [TestCase(55)]
+        [TestCase(35)]
         public void GivenNumberDivisibleBy5_ThenReturnBuzz(int number)
         {
             string result = game.Given(number);
@@ -55,7 +56,7 @@ namespace Kata.Tests
         [TestCase(15)]
         [TestCase(30)]
         [TestCase(45)]
-        [TestCase(90)]
+        [TestCase(60)]
         public void GivenNumberDivisibleBy3And5_ThenReturnFizzBuzz(int number)
         {
             string result = game.Given(number);
@@ -63,15 +64,14 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void GivenNumber_ThenCheckConvertByNumberConverter()
+        public void GivenNumber_ThenReceiveByNumberConverter()
         {
             INumberConverter numberConverter = Substitute.For<INumberConverter>();
-
             game = new FizzBuzz(numberConverter);
 
-            string result = game.Given(1);
+            string result = game.Given(2);
 
-            numberConverter.Received().Parse(Arg.Is(1));
+            numberConverter.Received().Convert(Arg.Is(2));
         }
     }
 }

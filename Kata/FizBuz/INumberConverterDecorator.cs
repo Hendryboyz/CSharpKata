@@ -1,4 +1,4 @@
-﻿namespace Kata
+﻿namespace Kata.FizBuz
 {
     public interface INumberConverterDecorator : INumberConverter
     {
