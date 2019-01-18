@@ -2,6 +2,6 @@
 {
     public interface INumberConverter
     {
-        string Convert(int number);
+        string Parse(int number);
     }
 }

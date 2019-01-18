@@ -1,23 +1,16 @@
-﻿using System.Text;
+﻿using System;
 
 namespace Kata.FizBuz
 {
     public class DefaultNumberConverter : INumberConverter
     {
-        private StringBuilder _result;
-
-        public DefaultNumberConverter(StringBuilder result)
+        public string Parse(int number)
         {
-            _result = result;
-        }
-
-        public string Convert(int number)
-        {
-            if (_result.Length == 0)
+            if (number % 3 == 0 || number % 5 == 0)
             {
-                _result.Append(number);
+                return string.Empty;
             }
-            return _result.ToString();
+            return Convert.ToString(number);
         }
     }
 }
