@@ -11,4 +11,4 @@
  * [Args](http://codingdojo.org/kata/Args/) : an example from [clean code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
  * [LeapYears](http://codingdojo.org/kata/LeapYears/)
  * [FizzBuzz](http://codingdojo.org/kata/FizzBuzz/) : a case to practice decorator pattern
- * Next maybe Kata Potter
+ * [Potter](http://codingdojo.org/kata/Potter/)
