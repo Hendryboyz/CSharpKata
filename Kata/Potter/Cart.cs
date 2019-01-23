@@ -2,28 +2,26 @@
 
 namespace Kata.Potter
 {
-    // http://codingdojo.org/kata/Potter/
     public class Cart
     {
-        private readonly int NUM_BOOK_IN_SERIES = 5;
         private readonly double BOOK_PRICE = 8.0;
+        private readonly int BOOKS_NUM_IN_SERIES = 5;
         private readonly double[] DISCOUNT = new double[] { 1, 1, 0.95, 0.9, 0.8, 0.75 };
-        private int fullSeries;
+
         private int[] _books;
-        private int[] bookSeries = new int[5];
+        private int[] bookCategory;
 
         public void Add(int[] books)
         {
+            BookValidation(books);
             _books = books;
-            BookValidation();
         }
 
-        private void BookValidation()
+        private void BookValidation(int[] books)
         {
-            foreach (var eachBook in _books)
+            foreach (int eachBook in books)
             {
-                bool isSeriesBook = eachBook >= NUM_BOOK_IN_SERIES || eachBook < 0;
-                if (isSeriesBook)
+                if (eachBook >= 5 || eachBook < 0)
                 {
                     throw new InvalidOperationException();
                 }
@@ -32,63 +30,65 @@ namespace Kata.Potter
 
         public double Checkout()
         {
-            ClassifyBooks();
-            fullSeries = 0;
+            ClassifyBook();
             double prices = 0;
+            double fullSeries = 0;
             while (true)
             {
-                int checkingoutBooks = ExtractDifferentBooks();
-                if (checkingoutBooks == 0)
+                int checkoutBook = GetCheckoutBook();
+                if (checkoutBook == 0)
                 {
                     break;
                 }
-                else if (checkingoutBooks == NUM_BOOK_IN_SERIES)
+                else if (checkoutBook == 3 && fullSeries > 0)
+                {
+                    prices += 2 * CalculatePrices(4);
+                    fullSeries--;
+                }
+                else if (checkoutBook == BOOKS_NUM_IN_SERIES)
                 {
                     fullSeries++;
                 }
-                else if (checkingoutBooks == 3 && fullSeries > 0)
-                {
-                    prices += 2 * GetPrices(4);
-                    fullSeries--;
-                }
                 else
                 {
-                    prices += GetPrices(checkingoutBooks);
+                    prices += CalculatePrices(checkoutBook);
                 }
             }
 
             if (fullSeries > 0)
             {
-                prices += fullSeries * GetPrices(NUM_BOOK_IN_SERIES);
+                prices += fullSeries * CalculatePrices(BOOKS_NUM_IN_SERIES);
             }
             return prices;
         }
 
-        private void ClassifyBooks()
+        private int GetCheckoutBook()
         {
-            foreach (int eachBook in _books)
+            int checkoutBook = 0;
+            for (int i = 0; i < BOOKS_NUM_IN_SERIES; i++)
             {
-                bookSeries[eachBook]++;
-            }
-        }
-
-        private double GetPrices(int numberOfBooks)
-        {
-            return numberOfBooks * BOOK_PRICE * DISCOUNT[numberOfBooks];
-        }
-
-        private int ExtractDifferentBooks()
-        {
-            int checkingoutBooks = 0;
-            for (int i = 0; i < NUM_BOOK_IN_SERIES; i++)
-            {
-                if (bookSeries[i] > 0)
+                if (bookCategory[i] > 0)
                 {
-                    bookSeries[i]--;
-                    checkingoutBooks++;
+                    checkoutBook++;
+                    bookCategory[i]--;
                 }
             }
-            return checkingoutBooks;
+
+            return checkoutBook;
+        }
+
+        private double CalculatePrices(int numberOfBook)
+        {
+            return numberOfBook * BOOK_PRICE * DISCOUNT[numberOfBook];
+        }
+
+        private void ClassifyBook()
+        {
+            bookCategory = new int[BOOKS_NUM_IN_SERIES];
+            foreach (int eachBook in _books)
+            {
+                bookCategory[eachBook]++;
+            }
         }
     }
 }
