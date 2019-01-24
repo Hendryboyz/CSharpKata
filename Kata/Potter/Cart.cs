@@ -4,91 +4,89 @@ namespace Kata.Potter
 {
     public class Cart
     {
-        private readonly double BOOK_PRICE = 8.0;
-        private readonly int BOOKS_NUM_IN_SERIES = 5;
+        private readonly double BOOK_PRICES = 8;
         private readonly double[] DISCOUNT = new double[] { 1, 1, 0.95, 0.9, 0.8, 0.75 };
-
+        private readonly int BOOK_NUM_IN_SERIES = 5;
         private int[] _books;
-        private int[] bookCategory;
+        private int[] _bookCategory;
 
         public void Add(int[] books)
         {
-            BookValidation(books);
-            _books = books;
-        }
-
-        private void BookValidation(int[] books)
-        {
             foreach (int eachBook in books)
             {
-                if (eachBook >= 5 || eachBook < 0)
+                if (eachBook < 0 || eachBook >= BOOK_NUM_IN_SERIES)
                 {
                     throw new InvalidOperationException();
                 }
             }
+            _books = books;
         }
 
         public double Checkout()
         {
-            ClassifyBook();
+            if (_books is null)
+            {
+                return 0;
+            }
+            ClassifyBooks();
             double prices = 0;
-            double fullSeries = 0;
+            int fullSeries = 0;
             while (true)
             {
-                int checkoutBook = GetCheckoutBook();
-                if (checkoutBook == 0)
+                int checkoutBooks = GetCheckoutBooks();
+                if (checkoutBooks == 0)
                 {
                     break;
                 }
-                else if (checkoutBook == 3 && fullSeries > 0)
-                {
-                    prices += 2 * CalculatePrices(4);
-                    fullSeries--;
-                }
-                else if (checkoutBook == BOOKS_NUM_IN_SERIES)
+                else if (checkoutBooks == BOOK_NUM_IN_SERIES)
                 {
                     fullSeries++;
                 }
+                else if (checkoutBooks == 3 && fullSeries > 0)
+                {
+                    fullSeries--;
+                    prices += 2 * CalculatePrices(4);
+                }
                 else
                 {
-                    prices += CalculatePrices(checkoutBook);
+                    prices += CalculatePrices(checkoutBooks);
                 }
             }
 
             if (fullSeries > 0)
             {
-                prices += fullSeries * CalculatePrices(BOOKS_NUM_IN_SERIES);
+                prices += fullSeries * CalculatePrices(BOOK_NUM_IN_SERIES);
             }
             return prices;
         }
 
-        private int GetCheckoutBook()
+        private double CalculatePrices(int numOfBooks)
         {
-            int checkoutBook = 0;
-            for (int i = 0; i < BOOKS_NUM_IN_SERIES; i++)
+            return numOfBooks * BOOK_PRICES * DISCOUNT[numOfBooks];
+        }
+
+        private void ClassifyBooks()
+        {
+            _bookCategory = new int[BOOK_NUM_IN_SERIES];
+            foreach (int eachBook in _books)
             {
-                if (bookCategory[i] > 0)
+                _bookCategory[eachBook]++;
+            }
+        }
+
+        private int GetCheckoutBooks()
+        {
+            int checkoutBooks = 0;
+            for (int i = 0; i < BOOK_NUM_IN_SERIES; i++)
+            {
+                if (_bookCategory[i] > 0)
                 {
-                    checkoutBook++;
-                    bookCategory[i]--;
+                    _bookCategory[i]--;
+                    checkoutBooks++;
                 }
             }
 
-            return checkoutBook;
-        }
-
-        private double CalculatePrices(int numberOfBook)
-        {
-            return numberOfBook * BOOK_PRICE * DISCOUNT[numberOfBook];
-        }
-
-        private void ClassifyBook()
-        {
-            bookCategory = new int[BOOKS_NUM_IN_SERIES];
-            foreach (int eachBook in _books)
-            {
-                bookCategory[eachBook]++;
-            }
+            return checkoutBooks;
         }
     }
 }
