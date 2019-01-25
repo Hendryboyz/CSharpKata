@@ -4,22 +4,29 @@ namespace Kata.Potter
 {
     public class Cart
     {
-        private readonly double BOOK_PRICES = 8;
         private readonly double[] DISCOUNT = new double[] { 1, 1, 0.95, 0.9, 0.8, 0.75 };
         private readonly int BOOK_NUM_IN_SERIES = 5;
+        private readonly int BOOK_PRICES = 8;
+
         private int[] _books;
-        private int[] _bookCategory;
 
         public void Add(int[] books)
         {
+            ValidateArgument(books);
+            _books = books;
+        }
+
+        private void ValidateArgument(int[] books)
+        {
             foreach (int eachBook in books)
             {
-                if (eachBook < 0 || eachBook >= BOOK_NUM_IN_SERIES)
+                bool bookInSeries = eachBook >= 0 && eachBook < BOOK_NUM_IN_SERIES;
+                if (!bookInSeries)
                 {
-                    throw new InvalidOperationException();
+                    _books = null;
+                    throw new ArgumentOutOfRangeException();
                 }
             }
-            _books = books;
         }
 
         public double Checkout()
@@ -28,12 +35,14 @@ namespace Kata.Potter
             {
                 return 0;
             }
-            ClassifyBooks();
+
+            int[] bookStacks = ClassifyBooks();
+
             double prices = 0;
             int fullSeries = 0;
             while (true)
             {
-                int checkoutBooks = GetCheckoutBooks();
+                int checkoutBooks = GetCheckoutBooks(bookStacks);
                 if (checkoutBooks == 0)
                 {
                     break;
@@ -57,36 +66,37 @@ namespace Kata.Potter
             {
                 prices += fullSeries * CalculatePrices(BOOK_NUM_IN_SERIES);
             }
+
             return prices;
         }
 
         private double CalculatePrices(int numOfBooks)
         {
-            return numOfBooks * BOOK_PRICES * DISCOUNT[numOfBooks];
+            return BOOK_PRICES * numOfBooks * DISCOUNT[numOfBooks];
         }
 
-        private void ClassifyBooks()
-        {
-            _bookCategory = new int[BOOK_NUM_IN_SERIES];
-            foreach (int eachBook in _books)
-            {
-                _bookCategory[eachBook]++;
-            }
-        }
-
-        private int GetCheckoutBooks()
+        private int GetCheckoutBooks(int[] bookStacks)
         {
             int checkoutBooks = 0;
             for (int i = 0; i < BOOK_NUM_IN_SERIES; i++)
             {
-                if (_bookCategory[i] > 0)
+                if (bookStacks[i] > 0)
                 {
-                    _bookCategory[i]--;
+                    bookStacks[i]--;
                     checkoutBooks++;
                 }
             }
-
             return checkoutBooks;
+        }
+
+        private int[] ClassifyBooks()
+        {
+            int[] bookStacks = new int[BOOK_NUM_IN_SERIES];
+            foreach (int eachBook in _books)
+            {
+                bookStacks[eachBook]++;
+            }
+            return bookStacks;
         }
     }
 }
