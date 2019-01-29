@@ -47,5 +47,13 @@ namespace Kata.Tests
 
             Assert.AreEqual(expected, result);
         }
+
+        [Test]
+        public void GivenDigitAndScale_WhenConvert_ThenReturnLcdFormat()
+        {
+            string result = converter.Convert(2, 2, 2);
+            Console.WriteLine(result);
+            Assert.AreEqual(" ____ \n     |\n     |\n ____ \n|     \n|     \n ____ \n", result);
+        }
     }
 }
