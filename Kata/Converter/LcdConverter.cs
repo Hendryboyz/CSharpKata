@@ -1,10 +1,11 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Kata.Converter
 {
     public class LcdConverter
     {
-        private readonly string[] lcdNumbers = new string[] 
+        private readonly string[] LCD_NUMBERS = new string[]
         {
             " _ \n| |\n|_|", // 0
             "   \n  |\n  |", // 1
@@ -15,127 +16,109 @@ namespace Kata.Converter
             "   \n|_ \n|_|", // 6
             " _ \n  |\n  |", // 7
             " _ \n|_|\n|_|", // 8
-            " _ \n|_|\n _|"  // 9
+            " _ \n|_|\n _|" // 9
         };
-
-        private int _convertingDigit;
+        private StringBuilder _scaleResult;
 
         public string Convert(int digit, int widthScale = 1, int heightScale = 1)
         {
-            _convertingDigit = digit;
+            if (digit < 0 || digit > 9)
+            {
+                throw new InvalidCastException();
+            }
+
             if (widthScale == 1 && heightScale == 1)
             {
-                return lcdNumbers[_convertingDigit];
+                return LCD_NUMBERS[digit];
             }
             else
             {
-                return ScaleLcdNumber(widthScale, heightScale);
+                return ScaleDigitNumber(digit, widthScale, heightScale);
             }
         }
 
-        private StringBuilder _scaledDigitNumber;
-
-        private string ScaleLcdNumber(int widthScale, int heightScale)
+        private string ScaleDigitNumber(int digit, int widthScale, int heightScale)
         {
-            string[] lcdNumParts = lcdNumbers[_convertingDigit].Split("\n");
-
-            _scaledDigitNumber = new StringBuilder();
-            foreach (string eachPart in lcdNumParts)
+            _scaleResult = new StringBuilder();
+            foreach (string eachPart in SplitDigitPart(digit))
             {
                 if (eachPart.Equals(" _ "))
                 {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendTopLineScale(scalePart);
+                    AppendTopLine(widthScale, eachPart.Length);
                 }
                 else if (eachPart.Equals("| |"))
-                {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendBothSideScale(heightScale, scalePart);
-                }
+                { }
+                else if (eachPart.Equals("|_|"))
+                { }
                 else if (eachPart.Equals("|_ "))
                 {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendLeftSideScale(heightScale, scalePart);
-
-                    scalePart = NewScalePart(widthScale, eachPart);
-                    AppendTopLineScale(scalePart);
+                    AppendLeftLine(eachPart, widthScale, heightScale);
+                    AppendTopLine(widthScale, eachPart.Length);
                 }
                 else if (eachPart.Equals(" _|"))
                 {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendRightSideScale(heightScale, scalePart);
-
-                    scalePart = NewScalePart(widthScale, eachPart);
-                    AppendTopLineScale(scalePart);
+                    AppendRightLine(eachPart, widthScale, heightScale);
+                    AppendTopLine(widthScale, eachPart.Length);
                 }
                 else if (eachPart.Equals("  |"))
-                {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendRightSideScale(heightScale, scalePart);
-                }
-                else if (eachPart.Equals("|_|"))
-                {
-                    char[] scalePart = NewScalePart(widthScale, eachPart);
-                    AppendBothSideScale(heightScale, scalePart);
-
-                    scalePart = NewScalePart(widthScale, eachPart);
-                    AppendTopLineScale(scalePart);
-                }
+                { }
+                else if (eachPart.Equals("|  "))
+                { }
             }
-            return _scaledDigitNumber.ToString();
+            return _scaleResult.ToString();
         }
 
-        private void AppendLeftSideScale(int heightScale, char[] scalePart)
+        private void AppendRightLine(string eachPart, int widthScale, int heightScale)
         {
-            scalePart[0] = '|';
-            for (int i = 0; i < heightScale; i++)
+            char[] scalePart = new char[eachPart.Length * widthScale];
+            for (int i = 0; i < scalePart.Length; i++)
             {
-                AppendScalePart(scalePart);
+                scalePart[i] = ' ';
             }
-        }
-
-        private void AppendRightSideScale(int heightScale, char[] scalePart)
-        {
             scalePart[scalePart.Length - 1] = '|';
             for (int i = 0; i < heightScale; i++)
             {
-                AppendScalePart(scalePart);
+                AppendScalePartToResult(scalePart);
             }
         }
 
-        private void AppendBothSideScale(int heightScale, char[] scalePart)
+        private void AppendLeftLine(string eachPart, int widthScale, int heightScale)
         {
+            char[] scalePart = new char[eachPart.Length * widthScale];
+            for (int i = 0; i < scalePart.Length; i++)
+            {
+                scalePart[i] = ' ';
+            }
             scalePart[0] = '|';
-            scalePart[scalePart.Length - 1] = '|';
             for (int i = 0; i < heightScale; i++)
             {
-                AppendScalePart(scalePart);
+                AppendScalePartToResult(scalePart);
             }
         }
 
-        private void AppendTopLineScale(char[] scalePart)
+        private void AppendTopLine(int widthScale, int unitOfPart)
         {
+            char[] scalePart = new char[unitOfPart * widthScale];
+            for (int i = 0; i < scalePart.Length; i++)
+            {
+                scalePart[i] = ' ';
+            }
             for (int i = 1; i < scalePart.Length - 1; i++)
             {
                 scalePart[i] = '_';
             }
-            AppendScalePart(scalePart);
+            AppendScalePartToResult(scalePart);
         }
 
-        private void AppendScalePart(char[] scalePart)
+        private void AppendScalePartToResult(char[] scalePart)
         {
-            _scaledDigitNumber.AppendFormat("{0}\n", new string(scalePart));
+            _scaleResult.AppendFormat("{0}\n", new string(scalePart));
         }
 
-        private char[] NewScalePart(int widthScale, string eachPart)
+        private string[] SplitDigitPart(int digit)
         {
-            char[] scalePart = new char[eachPart.Length * widthScale];
-            for (int i = 0; i < eachPart.Length * widthScale; i++)
-            {
-                scalePart[i] = ' ';
-            }
-
-            return scalePart;
+            string digitUnit = LCD_NUMBERS[digit];
+            return digitUnit.Split("\n");
         }
     }
 }

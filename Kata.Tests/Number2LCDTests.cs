@@ -17,17 +17,16 @@ namespace Kata.Tests
         }
 
         [SetUp]
-        public void SetUp()
+        public void CanSetUp()
         {
             CanCreate();
         }
 
         [Test]
-        public void CanConvertDigit()
+        public void CanGivenDigitAndConvert()
         {
             string result = converter.Convert(1);
             Console.WriteLine(result);
-
             Assert.AreEqual("   \n  |\n  |", result);
         }
 
@@ -40,20 +39,26 @@ namespace Kata.Tests
         [TestCase(8, " _ \n|_|\n|_|")]
         [TestCase(9, " _ \n|_|\n _|")]
         [TestCase(0, " _ \n| |\n|_|")]
-        public void GivenDigit_WhenConvert_ThenReturnLcdFormat(int digit, string expected)
+        public void GivenSingleDigit_WhenConvert_ThenReturnLcdDigit(int digit, string expected)
         {
             string result = converter.Convert(digit);
             Console.WriteLine(result);
-
             Assert.AreEqual(expected, result);
         }
 
         [Test]
-        public void GivenDigitAndScale_WhenConvert_ThenReturnLcdFormat()
+        public void GivenNumberNotDigit_WhenConvert_ThenThrowInvalidCastException()
         {
-            string result = converter.Convert(2, 2, 2);
-            Console.WriteLine(result);
-            Assert.AreEqual(" ____ \n     |\n     |\n ____ \n|     \n|     \n ____ \n", result);
+            Assert.Throws<InvalidCastException>(() => converter.Convert(10));
         }
+
+        [TestCase(2, " ____ \n     |\n     |\n ____ \n|     \n|     \n ____ \n")]
+        public void GivenNumberAndScale_WhenConvert_ThenReturnScaleLcdDigit(int digit, string expected)
+        {
+            string result = converter.Convert(digit, 2, 2);
+            Console.WriteLine(result);
+            Assert.AreEqual(expected, result);
+        }
+
     }
 }
