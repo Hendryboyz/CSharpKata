@@ -7,27 +7,25 @@ namespace Kata.Tests
     [TestFixture]
     public class Number2LCDTests
     {
-        private LcdConverter converter;
+        private LcdConverter lcdConverter;
 
         [Test]
         public void CanCreate()
         {
-            converter = new LcdConverter();
-            Assert.NotNull(converter);
+            lcdConverter = new LcdConverter();
+            Assert.NotNull(lcdConverter);
         }
 
         [SetUp]
-        public void CanSetUp()
+        public void SetUp()
         {
             CanCreate();
         }
 
         [Test]
-        public void CanGivenDigitAndConvert()
+        public void CanConvertDigit()
         {
-            string result = converter.Convert(1);
-            Console.WriteLine(result);
-            Assert.AreEqual("   \n  |\n  |", result);
+            ConvertAndAssert(1, "   \n  |\n  |");
         }
 
         [TestCase(2, " _ \n _|\n|_ ")]
@@ -39,26 +37,35 @@ namespace Kata.Tests
         [TestCase(8, " _ \n|_|\n|_|")]
         [TestCase(9, " _ \n|_|\n _|")]
         [TestCase(0, " _ \n| |\n|_|")]
-        public void GivenSingleDigit_WhenConvert_ThenReturnLcdDigit(int digit, string expected)
+        public void GivenSingleDigit_WhenConvert_ThenReturnLcdNumber(int digit, string expected)
         {
-            string result = converter.Convert(digit);
+            ConvertAndAssert(digit, expected);
+        }
+
+        private void ConvertAndAssert(int digit, string expected)
+        {
+            string result = lcdConverter.Convert(digit);
             Console.WriteLine(result);
             Assert.AreEqual(expected, result);
         }
 
-        [Test]
-        public void GivenNumberNotDigit_WhenConvert_ThenThrowInvalidCastException()
+        [TestCase(-1)]
+        [TestCase(10)]
+        public void GivenMultipleDigit_WhenConvert_ThenThrowInvalidCaseException(int digit)
         {
-            Assert.Throws<InvalidCastException>(() => converter.Convert(10));
+            Assert.Throws<InvalidCastException>(() => lcdConverter.Convert(digit));
         }
 
+        [TestCase(1, "      \n     |\n     |\n     |\n     |\n")]
         [TestCase(2, " ____ \n     |\n     |\n ____ \n|     \n|     \n ____ \n")]
-        public void GivenNumberAndScale_WhenConvert_ThenReturnScaleLcdDigit(int digit, string expected)
+        [TestCase(3, " ____ \n     |\n     |\n ____ \n     |\n     |\n ____ \n")]
+        [TestCase(4, "      \n|    |\n|    |\n ____ \n     |\n     |\n")]
+        public void GivenSingleDigitAndScale_WhenConvert_ThenReturnScaledNumber(
+            int digit, string expected)
         {
-            string result = converter.Convert(digit, 2, 2);
+            string result = lcdConverter.Convert(digit, 2, 2);
             Console.WriteLine(result);
             Assert.AreEqual(expected, result);
         }
-
     }
 }
