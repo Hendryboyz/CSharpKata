@@ -32,80 +32,73 @@ namespace Kata.Converter
             }
         }
 
+        private StringBuilder _scaledLcdNumber;
+
+        private string ScaleLcdNumber(int digit, int widthScale, int heightScale)
+        {
+            _scaledLcdNumber = new StringBuilder();
+            string unitLcdNumber = LCD_NUMBERS[digit];
+            string[] lcdNumberParts = unitLcdNumber.Split("\n");
+            foreach (string eachPart in lcdNumberParts)
+            {
+                if (eachPart.Equals("   "))
+                {
+                    char[] scaledPart = AllocateScaledSpace(eachPart.Length, widthScale);
+                    AppendScaledPart(scaledPart);
+                }
+                else if (eachPart.Equals("  |"))
+                {
+                    ScaleRightLine(widthScale, heightScale, eachPart);
+                }
+                else if (eachPart.Equals(" _ "))
+                {
+                    ScaleBottomLine(widthScale, eachPart);
+                }
+                else if (eachPart.Equals(" _|"))
+                {
+                    ScaleRightLine(widthScale, heightScale, eachPart);
+                    ScaleBottomLine(widthScale, eachPart);
+                }
+                else if (eachPart.Equals("|_ "))
+                {
+                    ScaleLeftLine(widthScale, heightScale, eachPart);
+                    ScaleBottomLine(widthScale, eachPart);
+                }
+                else if (eachPart.Equals("|_|"))
+                {
+                    ScaleBothLine(widthScale, heightScale, eachPart);
+                    ScaleBottomLine(widthScale, eachPart);
+                }
+            }
+            return _scaledLcdNumber.ToString();
+        }
+
         private void VerifyDigit(int digit)
         {
             if (digit < 0 || digit > 9)
             {
-                throw new InvalidCastException();
+                throw new ArgumentOutOfRangeException();
             }
         }
 
-        private StringBuilder _scaledResult;
-
-        private string ScaleLcdNumber(int digit, int widthScale, int heightScale)
+        private void ScaleBottomLine(int widthScale, string eachPart)
         {
-            _scaledResult = new StringBuilder();
-            foreach (string eachPart in GetLcdNumberParts(digit))
-            {
-                if (eachPart.Equals("   "))
-                {
-                    AppendEmptyLineToResult(widthScale, eachPart);
-                }
-                else if (eachPart.Equals(" _ "))
-                {
-                    AppendUnderLineToResult(widthScale, eachPart);
-                }
-                else if (eachPart.Equals(" _|"))
-                {
-                    AppendRightLineToResult(widthScale, heightScale, eachPart);
-                    AppendUnderLineToResult(widthScale, eachPart);
-                }
-                else if (eachPart.Equals("|_ "))
-                {
-                    AppendLeftLineToResult(widthScale, heightScale, eachPart);
-                    AppendUnderLineToResult(widthScale, eachPart);
-                }
-                else if (eachPart.Equals("  |"))
-                {
-                    AppendRightLineToResult(widthScale, heightScale, eachPart);
-                }
-                else if (eachPart.Equals("|_|"))
-                {
-                    AppendBothLineToResult(widthScale, heightScale, eachPart);
-                    AppendUnderLineToResult(widthScale, eachPart);
-                }
-            }
-            return _scaledResult.ToString();
-        }
-
-        
-
-        private string[] GetLcdNumberParts(int digit)
-        {
-            string unitNumber = LCD_NUMBERS[digit];
-            string[] lcdNumberParts = unitNumber.Split("\n");
-            return lcdNumberParts;
-        }
-
-        private void AppendEmptyLineToResult(int widthScale, string eachPart)
-        {
-            char[] scaledPart = GetScaledPartSpcae(widthScale, eachPart);
-            AppendScaledNumberPartToResult(scaledPart);
-        }
-
-        private void AppendUnderLineToResult(int widthScale, string eachPart)
-        {
-            char[] scaledPart = GetScaledPartSpcae(widthScale, eachPart);
+            char[] scaledPart = AllocateScaledSpace(eachPart.Length, widthScale);
             for (int i = 1; i < scaledPart.Length - 1; i++)
             {
                 scaledPart[i] = '_';
             }
-            AppendScaledNumberPartToResult(scaledPart);
+            AppendScaledPart(scaledPart);
         }
 
-        private char[] GetScaledPartSpcae(int widthScale, string eachPart)
+        private void AppendScaledPart(char[] scaledPart)
         {
-            char[] scaledPart = new char[eachPart.Length * widthScale];
+            _scaledLcdNumber.AppendFormat("{0}\n", new string(scaledPart));
+        }
+
+        private char[] AllocateScaledSpace(int unitOfLength, int widthScale)
+        {
+            char[] scaledPart = new char[unitOfLength * widthScale];
             for (int i = 0; i < scaledPart.Length; i++)
             {
                 scaledPart[i] = ' ';
@@ -113,39 +106,34 @@ namespace Kata.Converter
             return scaledPart;
         }
 
-        private void AppendScaledNumberPartToResult(char[] scaledPart)
+        private void ScaleLeftLine(int widthScale, int heightScale, string eachPart)
         {
-            _scaledResult.AppendFormat("{0}\n", new string(scaledPart));
-        }
-
-        private void AppendLeftLineToResult(int widthScale, int heightScale, string eachPart)
-        {
-            char[] scaledPart = GetScaledPartSpcae(widthScale, eachPart);
+            char[] scaledPart = AllocateScaledSpace(eachPart.Length, widthScale);
             scaledPart[0] = '|';
-            AppendVerticalScaledPartToResult(heightScale, scaledPart);
+            AppendVerticalComponent(heightScale, scaledPart);
         }
 
-        private void AppendRightLineToResult(int widthScale, int heightScale, string eachPart)
+        private void ScaleRightLine(int widthScale, int heightScale, string eachPart)
         {
-            char[] scaledPart = GetScaledPartSpcae(widthScale, eachPart);
+            char[] scaledPart = AllocateScaledSpace(eachPart.Length, widthScale);
             scaledPart[scaledPart.Length - 1] = '|';
-            AppendVerticalScaledPartToResult(heightScale, scaledPart);
+            AppendVerticalComponent(heightScale, scaledPart);
         }
 
-        private void AppendVerticalScaledPartToResult(int heightScale, char[] scaledPart)
+        private void ScaleBothLine(int widthScale, int heightScale, string eachPart)
+        {
+            char[] scaledPart = AllocateScaledSpace(eachPart.Length, widthScale);
+            scaledPart[0] = '|';
+            scaledPart[scaledPart.Length - 1] = '|';
+            AppendVerticalComponent(heightScale, scaledPart);
+        }
+
+        private void AppendVerticalComponent(int heightScale, char[] scaledPart)
         {
             for (int i = 0; i < heightScale; i++)
             {
-                AppendScaledNumberPartToResult(scaledPart);
+                AppendScaledPart(scaledPart);
             }
-        }
-
-        private void AppendBothLineToResult(int widthScale, int heightScale, string eachPart)
-        {
-            char[] scaledPart = GetScaledPartSpcae(widthScale, eachPart);
-            scaledPart[scaledPart.Length - 1] = '|';
-            scaledPart[0] = '|';
-            AppendVerticalScaledPartToResult(heightScale, scaledPart);
         }
     }
 }

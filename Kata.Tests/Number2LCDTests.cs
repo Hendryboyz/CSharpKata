@@ -22,10 +22,17 @@ namespace Kata.Tests
             CanCreate();
         }
 
-        [Test(ExpectedResult = "   \n  |\n  |")]
-        public string CanConvertDigit()
+        [Test(ExpectedResult = ("   \n  |\n  |"))]
+        public string CanGivenDigitAndConvert()
         {
-            return ConvertAndGetResult(1);
+            return ConvertAndPrintResult(1);
+        }
+
+        private string ConvertAndPrintResult(int digit)
+        {
+            string result = lcdConverter.Convert(digit);
+            Console.WriteLine(result);
+            return result;
         }
 
         [TestCase(2, ExpectedResult = " _ \n _|\n|_ ")]
@@ -37,30 +44,24 @@ namespace Kata.Tests
         [TestCase(8, ExpectedResult = " _ \n|_|\n|_|")]
         [TestCase(9, ExpectedResult = " _ \n|_|\n _|")]
         [TestCase(0, ExpectedResult = " _ \n| |\n|_|")]
-        public string GivenSingleDigit_WhenConvert_ThenReturnLcdNumberString(int digit)
+        public string GivenSingleDigit_WhenConvert_ThenReturnLcdNumber(int digit)
         {
-            return ConvertAndGetResult(digit);
-        }
-
-        private string ConvertAndGetResult(int digit)
-        {
-            string result = lcdConverter.Convert(digit);
-            Console.WriteLine(result);
-            return result;
+            return ConvertAndPrintResult(digit);
         }
 
         [TestCase(-1)]
         [TestCase(10)]
-        public void GivenTwoDigit_WhenConvert_ThenThrowInvalidCastException(int digit)
+        public void GivenMultipleDigit_WhenConvert_ThenThrowArgumentOutOfRangeExceptionException(int digit)
         {
-            Assert.Throws<InvalidCastException>(() => lcdConverter.Convert(digit));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lcdConverter.Convert(digit));
         }
+
 
         [TestCase(1, ExpectedResult = "      \n     |\n     |\n     |\n     |\n")]
         [TestCase(2, ExpectedResult = " ____ \n     |\n     |\n ____ \n|     \n|     \n ____ \n")]
         [TestCase(3, ExpectedResult = " ____ \n     |\n     |\n ____ \n     |\n     |\n ____ \n")]
         [TestCase(4, ExpectedResult = "      \n|    |\n|    |\n ____ \n     |\n     |\n")]
-        public string GivenSingleDigitAndScale_WhenConvert_ThenReturScaledLcdNumberString(int digit)
+        public string GivenSingleDigitAndScale_WhenConvert_ThenRetunScaledLcdNumber(int digit)
         {
             string result = lcdConverter.Convert(digit, 2, 2);
             Console.WriteLine(result);
