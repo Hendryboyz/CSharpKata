@@ -6,12 +6,12 @@ namespace Kata.Tests
     [TestFixture]
     public class RomanCalculatorTests
     {
-        private RomainCalculator calculator;
+        private RomanCalculator calculator;
 
         [Test]
         public void CanCreate()
         {
-            calculator = new RomainCalculator();
+            calculator = new RomanCalculator();
             Assert.NotNull(calculator);
         }
 
@@ -26,15 +26,6 @@ namespace Kata.Tests
         {
             string result = calculator.Add("I", "I");
             Assert.AreEqual("II", result);
-        }
-
-        [TestCase("I", "III", ExpectedResult = "IV")]
-        [TestCase("IV", "I", ExpectedResult = "V")]
-        [TestCase("IV", "III", ExpectedResult = "VII")]
-        [TestCase("IV", "IV", ExpectedResult = "VIII")]
-        public string GivenTwoRomanNumber_WhenAdd_ThenReturnSummary(string augend, string addend)
-        {
-            return calculator.Add(augend, addend);
         }
     }
 }

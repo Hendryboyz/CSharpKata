@@ -14,4 +14,5 @@
  
  * [Potter](http://codingdojo.org/kata/Potter/)
  * [Number to LCD](http://codingdojo.org/kata/NumberToLCD/)
- * [Roman Calculator](http://codingdojo.org/kata/RomanCalculator/)
+ * [Roman Calculator](http://codingdojo.org/kata/RomanCalculator/) -- temporary skipping
+ * [Roman Numberals](http://codingdojo.org/kata/RomanNumerals/)
