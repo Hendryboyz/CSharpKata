@@ -22,10 +22,10 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void CanConvertToRoman()
+        public void CanConvertNumberToRoman()
         {
-            string result = converter.ConvertFromDigit(1);
-            Assert.AreEqual("I", result);
+            string roman = converter.Convert(1);
+            Assert.AreEqual("I", roman);
         }
 
         [TestCase(2, ExpectedResult = "II")]
@@ -34,22 +34,9 @@ namespace Kata.Tests
         [TestCase(6, ExpectedResult = "VI")]
         [TestCase(4, ExpectedResult = "IV")]
         [TestCase(9, ExpectedResult = "IX")]
-        public string GivenDigitLessEqual10_WhenConvertFromDigit_ThenReturnRomanNumber(int number)
+        public string GivenNumberLessEquan10_WhenConvert_ThenReturnRomanNumber(int number)
         {
-            return converter.ConvertFromDigit(number);
-        }
-
-        [TestCase(50, ExpectedResult = "L")]
-        [TestCase(45, ExpectedResult = "XLV")]
-        public string GivenDigitLessEquan50_WhenConvertFromDigit_ThenReturnRomanNumber(int number)
-        {
-            return converter.ConvertFromDigit(number);
-        }
-
-        [TestCase(99, ExpectedResult = "XCIX")]
-        public string GivenDigitLessEquan100_WhenConvertFromDigit_ThenReturnRomanNumber(int number)
-        {
-            return converter.ConvertFromDigit(number);
+            return converter.Convert(number);
         }
     }
 }

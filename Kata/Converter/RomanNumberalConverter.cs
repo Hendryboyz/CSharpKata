@@ -5,85 +5,67 @@ namespace Kata.Converter
 {
     public class RomanNumberalConverter
     {
-        private readonly int[] DECIMAL_UNITS = new int[] { 100, 50, 10, 5, 1 };
-
-        private readonly IDictionary<int, string> _decimalMapping;
+        private readonly int[] _decimalNumber;
+        private readonly IDictionary<int, string> _romanNumberalsTable;
 
         public RomanNumberalConverter()
         {
-            _decimalMapping = new Dictionary<int, string>()
+            _decimalNumber = new int[] { 10, 5, 1 };
+            _romanNumberalsTable = new Dictionary<int, string>()
             {
                 { 1, "I" },
                 { 5, "V" },
-                { 10, "X" },
-                { 50, "L" },
-                { 100, "C" }
+                { 10, "X" }
             };
         }
 
-        public string ConvertFromDigit(int digit)
+        public string Convert(int number)
         {
             StringBuilder _result = new StringBuilder();
-            while(true)
+            for (int i = 0; i < _decimalNumber.Length; i++)
             {
-                for (int i = 0; i < DECIMAL_UNITS.Length; i++)
+                int baseNumber = _decimalNumber[i];
+                int decrement = GetDecrement(i);
+
+                while (number >= baseNumber - decrement)
                 {
-                    int eachUnit = DECIMAL_UNITS[i];
-                    if (digit >= eachUnit)
+                    if (number < baseNumber)
                     {
-                        _result.Append(_decimalMapping[eachUnit]);
-                        digit -= eachUnit;
+                        number -= baseNumber - decrement;
+                        _result.Append(_romanNumberalsTable[decrement]);
                     }
-                    else if (GetDecrementSize(digit, i, eachUnit) > 0)
+                    else
                     {
-                        int decrement = GetDecrement(digit, i, eachUnit);
-                        _result.Append(_decimalMapping[decrement]);
-                        _result.Append(_decimalMapping[eachUnit]);
-                        digit -= (eachUnit - decrement);
+                        number -= baseNumber;
                     }
-                }
-                if (digit == 0)
-                {
-                    break;
+                    _result.Append(_romanNumberalsTable[baseNumber]);
+
                 }
             }
             return _result.ToString();
         }
 
-        private int GetDecrementSize(int digit, int i, int eachUnit)
+        private int GetDecrement(int i)
         {
-            if (i < DECIMAL_UNITS.Length - 1 &&
-                digit == eachUnit - DECIMAL_UNITS[i + 1] &&
-                digit != DECIMAL_UNITS[i + 1])
+            int decrement = 0;
+            if (i + 1 < _decimalNumber.Length)
             {
-                return 1;
+                decrement = _decimalNumber[i + 1];
             }
-            else if (i < DECIMAL_UNITS.Length - 2 &&
-                     digit >= eachUnit - DECIMAL_UNITS[i + 2])
-            {
-                return 2;
-            }
-            return 0;
-        }
 
-        private int GetDecrement(int digit, int i, int eachUnit)
-        {
-            int decrementSize = GetDecrementSize(digit, i, eachUnit);
-
-            if ((DECIMAL_UNITS[i + decrementSize] == 1 || 
-                DECIMAL_UNITS[i + decrementSize] == 10))
+            if (IsInvalidDecrement(decrement))
             {
-
-                return DECIMAL_UNITS[i + decrementSize];
-            }
-            else
-            {
-                if (eachUnit - 10 < digit)
+                if (i + 2 < _decimalNumber.Length)
                 {
-                    return 10;
+                    decrement = _decimalNumber[i + 2];
                 }
             }
-            return 0;
+            return decrement;
+        }
+
+        private bool IsInvalidDecrement(int decrement)
+        {
+            return decrement == 5;
         }
     }
 }
