@@ -1,8 +1,11 @@
-# Repository for TDD practicing
+# Repository for CSharp TDD practicing
 
 ## Resource
 
 [Coding Dojo](http://codingdojo.org/)
+
+## Document
+Just a Kata repository, What are you doing ?? :)
 
 ## Practice Kata List
 
