@@ -22,10 +22,10 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void CanConvertNumberToRoman()
+        public void CanConvertFromDecimal()
         {
-            string roman = converter.Convert(1);
-            Assert.AreEqual("I", roman);
+            string romanNumber = converter.ConvertFromDecimal(1);
+            Assert.AreEqual("I", romanNumber);
         }
 
         [TestCase(2, ExpectedResult = "II")]
@@ -34,9 +34,25 @@ namespace Kata.Tests
         [TestCase(6, ExpectedResult = "VI")]
         [TestCase(4, ExpectedResult = "IV")]
         [TestCase(9, ExpectedResult = "IX")]
-        public string GivenNumberLessEquan10_WhenConvert_ThenReturnRomanNumber(int number)
+        public string GivenNumberLessEqual10_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
         {
-            return converter.Convert(number);
+            return converter.ConvertFromDecimal(number);
+        }
+
+        [TestCase(50, ExpectedResult = "L")]
+        [TestCase(100, ExpectedResult = "C")]
+        [TestCase(500, ExpectedResult = "D")]
+        [TestCase(1000, ExpectedResult = "M")]
+        public string GivenAllBaseNumber_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
+        {
+            return converter.ConvertFromDecimal(number);
+        }
+
+        [TestCase(99, ExpectedResult = "XCIX")]
+        [TestCase(45, ExpectedResult = "XLV")]
+        public string GivenSpecialNumber_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
+        {
+            return converter.ConvertFromDecimal(number);
         }
     }
 }
