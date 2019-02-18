@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Kata.Converter
@@ -6,12 +7,12 @@ namespace Kata.Converter
     public class RomanNumberalConverter
     {
         private readonly int[] _decimal;
-        private readonly IDictionary<int, string> _decimalToRomanTable;
+        private readonly IDictionary<int, string> _decimalRomanTable;
 
         public RomanNumberalConverter()
         {
             _decimal = new int[] { 1000, 500, 100, 50, 10, 5, 1 };
-            _decimalToRomanTable = new Dictionary<int, string>()
+            _decimalRomanTable = new Dictionary<int, string>()
             {
                 { 1, "I" },
                 { 5, "V" },
@@ -25,52 +26,59 @@ namespace Kata.Converter
 
         public string ConvertFromDecimal(int number)
         {
+            VerifyNumber(number);
+
             StringBuilder _result = new StringBuilder();
+
             for (int i = 0; i < _decimal.Length; i++)
             {
-                int baseNumber = _decimal[i];
+                int decimalUnit = _decimal[i];
                 int decrement = GetDecrement(i);
-
-                while (number >= baseNumber - decrement)
+                while (number >= decimalUnit - decrement)
                 {
-                    if (number < baseNumber)
+                    bool mustHandleByDecrement = number < decimalUnit;
+                    if (mustHandleByDecrement)
                     {
-                        number -= baseNumber - decrement;
-                        _result.Append(_decimalToRomanTable[decrement]);
+                        number -= (decimalUnit - decrement);
+                        _result.Append(_decimalRomanTable[decrement]);
                     }
                     else
                     {
-                        number -= baseNumber;
+                        number -= decimalUnit;
                     }
-                    _result.Append(_decimalToRomanTable[baseNumber]);
+                    _result.Append(_decimalRomanTable[decimalUnit]);
                 }
             }
+
             return _result.ToString();
         }
 
-        private int GetDecrement(int decimalIndex)
+        private void VerifyNumber(int number)
+        {
+            if (number < 1)
+            {
+                throw new ArgumentException();
+            }
+        }
+
+        private int GetDecrement(int i)
         {
             int decrement = 0;
-
-            if (decimalIndex + 1 < _decimal.Length)
+            if (i + 1 < _decimal.Length)
             {
-                decrement = _decimal[decimalIndex + 1];
+                decrement = _decimal[i + 1];
             }
-
-            if (decimalIndex + 2 < _decimal.Length && 
-                !IsValidDecrement(decimalIndex))
+            if (i + 2 < _decimal.Length && !IsValidDrement(decrement))
             {
-                decrement = _decimal[decimalIndex + 2];
+                decrement = _decimal[i + 2];
             }
 
             return decrement;
         }
 
-        private bool IsValidDecrement(int decimalIndex)
+        private bool IsValidDrement(int decrement)
         {
-            return _decimal[decimalIndex + 1] != 5 &&
-                _decimal[decimalIndex + 1] != 50 && 
-                _decimal[decimalIndex + 1] != 500;
+            return decrement != 5 && decrement != 50 && decrement != 500;
         }
     }
 }

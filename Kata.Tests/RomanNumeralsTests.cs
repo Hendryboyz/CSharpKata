@@ -1,5 +1,6 @@
 ﻿using Kata.Converter;
 using NUnit.Framework;
+using System;
 
 namespace Kata.Tests
 {
@@ -34,7 +35,7 @@ namespace Kata.Tests
         [TestCase(6, ExpectedResult = "VI")]
         [TestCase(4, ExpectedResult = "IV")]
         [TestCase(9, ExpectedResult = "IX")]
-        public string GivenNumberLessEqual10_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
+        public string GivenDecimalLessThan10_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
         {
             return converter.ConvertFromDecimal(number);
         }
@@ -43,16 +44,23 @@ namespace Kata.Tests
         [TestCase(100, ExpectedResult = "C")]
         [TestCase(500, ExpectedResult = "D")]
         [TestCase(1000, ExpectedResult = "M")]
-        public string GivenAllBaseNumber_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
+        public string GivenBaseDecimalNumber_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
         {
             return converter.ConvertFromDecimal(number);
         }
 
         [TestCase(99, ExpectedResult = "XCIX")]
         [TestCase(45, ExpectedResult = "XLV")]
-        public string GivenSpecialNumber_WhenConvertFromDecimal_ThenReturnRomanNumberal(int number)
+        public string GivenCornerCaseNumber_WhenConvertFromDeciaml_ThenReturnRomanNumberal(int number)
         {
             return converter.ConvertFromDecimal(number);
+        }
+
+        [TestCase(0)]
+        [TestCase(-10)]
+        public void GivenInvalidNumber_WhenConvertFromDecimal_ThenThrowAgumentException(int number)
+        {
+            Assert.Throws<ArgumentException>(() => converter.ConvertFromDecimal(number));
         }
     }
 }
