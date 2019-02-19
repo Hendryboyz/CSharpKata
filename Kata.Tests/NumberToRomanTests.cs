@@ -5,7 +5,7 @@ using System;
 namespace Kata.Tests
 {
     [TestFixture]
-    public class RomanNumeralsTests
+    public class NumberToRomanTests
     {
         private RomanNumberalConverter converter;
 
