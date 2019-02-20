@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -95,53 +94,67 @@ namespace Kata.Converter
         }
         #endregion
 
-        #region ConvertFromRoman
-        public int ConvertFromRoman(string romanNumberal)
+        #region ConvertFromRomanNumberal
+        public int ConvertFromRomanNumberal(string romanNumberal)
         {
             int result = 0;
-            Stack<int> preservedNumber = new Stack<int>();
+            Stack<int> preservedNumbers = new Stack<int>();
             foreach (char eachNotation in romanNumberal)
             {
-                int curDecimal = _romanDecimalTable[eachNotation];
-                if (EmptyStack(preservedNumber) || IsValidAddend(preservedNumber, curDecimal))
+                int currentDecimal = _romanDecimalTable[eachNotation];
+                if (!HasSummarizingNumbers(preservedNumbers))
                 {
-                    preservedNumber.Push(curDecimal);
+                    preservedNumbers.Push(currentDecimal);
                 }
-                else if (IsDecreasedNumber(preservedNumber, curDecimal))
+                else if (IsValidAddend(preservedNumbers, currentDecimal))
                 {
-                    result += (curDecimal - preservedNumber.Pop());
+                    if (preservedNumbers.Peek() > currentDecimal)
+                    {
+                        result += preservedNumbers.Pop();
+                    }
+                    preservedNumbers.Push(currentDecimal);
+                }
+                else if (IsValidDecrement(preservedNumbers))
+                {
+                    result += (currentDecimal - preservedNumbers.Pop());
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+
+                if (preservedNumbers.Count > 3)
+                {
+                    throw new InvalidOperationException();
                 }
             }
 
-            result += SummaryStackValue(preservedNumber);
-
+            result += SummarizeNumbers(preservedNumbers);
             return result;
         }
 
-        private bool EmptyStack(Stack<int> preservedNumber)
+        private bool HasSummarizingNumbers(Stack<int> preservedNumber)
         {
-            return preservedNumber.Count == 0;
+            return preservedNumber.Count > 0;
         }
 
-        private bool IsValidAddend(Stack<int> preservedNumber, int curDecimal)
+        private bool IsValidAddend(Stack<int> preservedNumber, int number)
         {
-            return preservedNumber.Peek() >= curDecimal;
+            return preservedNumber.Peek() >= number;
         }
 
-        private bool IsDecreasedNumber(Stack<int> preservedNumber, int curDecimal)
+        private bool IsValidDecrement(Stack<int> preservedNumbers)
         {
-            // like 4(IV), 9(IX), 40(XL), 400(CD) ...etc
-            return preservedNumber.Count > 0 && preservedNumber.Peek() < curDecimal;
+            return preservedNumbers.Peek() != 5 && preservedNumbers.Peek() != 50 && preservedNumbers.Peek() != 500;
         }
 
-        private int SummaryStackValue(Stack<int> decimalStack)
+        private int SummarizeNumbers(Stack<int> preservedNumbers)
         {
             int result = 0;
-            while (!EmptyStack(decimalStack))
+            while (HasSummarizingNumbers(preservedNumbers))
             {
-                result += decimalStack.Pop();
+                result += preservedNumbers.Pop();
             }
-
             return result;
         }
         #endregion
