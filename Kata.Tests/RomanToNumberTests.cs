@@ -23,9 +23,9 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void CanConvertFromRomanNumberal()
+        public void CanConvertFromRoman()
         {
-            int result = converter.ConvertFromRomanNumberal("I");
+            int result = converter.ConvertFromRoman("I");
             Assert.AreEqual(1, result);
         }
 
@@ -35,43 +35,44 @@ namespace Kata.Tests
         [TestCase("VI", ExpectedResult = 6)]
         [TestCase("IV", ExpectedResult = 4)]
         [TestCase("IX", ExpectedResult = 9)]
-        public int GivenRomanNumberalLessThanX_WhenConvertFromRomanNumberal_ThenReturnDecimal(string romanNumberal)
+        public int GivenRomanNumberalLessThanX_WhenConvertFromRoman_ThenReturnDecimal(string roman)
         {
-            return converter.ConvertFromRomanNumberal(romanNumberal);
+            return converter.ConvertFromRoman(roman); 
         }
 
         [TestCase("L", ExpectedResult = 50)]
         [TestCase("C", ExpectedResult = 100)]
         [TestCase("D", ExpectedResult = 500)]
         [TestCase("M", ExpectedResult = 1000)]
-        public int GivenBaseRomanNumberal_WhenConvertFromRomanNumberal_ThenReturnDecimal(string romanNumberal)
+        public int GivenBaseRomanNumberalNotation_WhenConvertFromRoman_ThenReturnDecimal(string roman)
         {
-            return converter.ConvertFromRomanNumberal(romanNumberal);
+            return converter.ConvertFromRoman(roman);
         }
 
         [TestCase("XCIX", ExpectedResult = 99)]
         [TestCase("XLV", ExpectedResult = 45)]
-        public int GivenCornerCaseRomanNumberal_WhenConvertFromRomanNumberal_ThenReturnDecimal(string romanNumberal)
+        [TestCase("DCCCVIII", ExpectedResult = 808)]
+        public int GivenCornerRomanNumberal_WhenConvertFromRoman_ThenReturnDecimal(string roman)
         {
-            return converter.ConvertFromRomanNumberal(romanNumberal);
+            return converter.ConvertFromRoman(roman);
         }
 
         [TestCase("VX")]
         [TestCase("LC")]
         [TestCase("DM")]
-        public void GivenInvalidDecrementNumber_WhenConvertFromRomanNumberal_ThenThrowInvalidOperationExpcetion(string romanNumberal)
+        public void GivenInvalidDerementNotation_WhenConvertFromRoman_ThenThrowInvalidOperationException(string roman)
         {
-            Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRomanNumberal(romanNumberal));
+            Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRoman(roman));
         }
 
         [TestCase("IIII")]
         [TestCase("LIIII")]
-        public void GivenMoreThan3DuplicateNotation_WhenConvertFromRomanNumberal_ThenThrowInvalidOperationException(string romanNumberal)
+        [TestCase("VV")]
+        [TestCase("LL")]
+        [TestCase("DD")]
+        public void GivenInvalidDuplicatedNotation_WhenConvertFromRoman_ThenThrowInvalidOperationException(string roman)
         {
-            Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRomanNumberal(romanNumberal));
+            Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRoman(roman));
         }
-
-        //[TestCase("VV")]
-
     }
 }

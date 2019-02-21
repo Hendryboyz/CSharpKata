@@ -21,19 +21,22 @@ namespace Kata.Converter
                 { 50, "L" },
                 { 100, "C" },
                 { 500, "D" },
-                { 1000, "M" },
+                { 1000, "M" }
             };
+
             _romanDecimalTable = new Dictionary<char, int>()
             {
                 { 'I', 1 },
-                { 'V', 5 },
                 { 'X', 10 },
+                { 'V', 5 },
                 { 'L', 50 },
                 { 'C', 100 },
                 { 'D', 500 },
                 { 'M', 1000 }
             };
         }
+
+        
 
         #region ConvertFromDecimal
         public string ConvertFromDecimal(int number)
@@ -94,8 +97,7 @@ namespace Kata.Converter
         }
         #endregion
 
-        #region ConvertFromRomanNumberal
-        public int ConvertFromRomanNumberal(string romanNumberal)
+        public int ConvertFromRoman(string romanNumberal)
         {
             int result = 0;
             Stack<int> preservedNumbers = new Stack<int>();
@@ -106,15 +108,16 @@ namespace Kata.Converter
                 {
                     preservedNumbers.Push(currentDecimal);
                 }
-                else if (IsValidAddend(preservedNumbers, currentDecimal))
+                else if (preservedNumbers.Peek() > currentDecimal)
                 {
-                    if (preservedNumbers.Peek() > currentDecimal)
-                    {
-                        result += preservedNumbers.Pop();
-                    }
+                    result += SummarizeNumbers(preservedNumbers);
                     preservedNumbers.Push(currentDecimal);
                 }
-                else if (IsValidDecrement(preservedNumbers))
+                else if (preservedNumbers.Peek() == currentDecimal)
+                {
+                    preservedNumbers.Push(currentDecimal);
+                }
+                else if (HasDecrementNumber(preservedNumbers))
                 {
                     result += (currentDecimal - preservedNumbers.Pop());
                 }
@@ -123,29 +126,17 @@ namespace Kata.Converter
                     throw new InvalidOperationException();
                 }
 
-                if (preservedNumbers.Count > 3)
-                {
-                    throw new InvalidOperationException();
-                }
+                CheckDuplication(preservedNumbers);
             }
 
             result += SummarizeNumbers(preservedNumbers);
             return result;
         }
 
+
         private bool HasSummarizingNumbers(Stack<int> preservedNumber)
         {
             return preservedNumber.Count > 0;
-        }
-
-        private bool IsValidAddend(Stack<int> preservedNumber, int number)
-        {
-            return preservedNumber.Peek() >= number;
-        }
-
-        private bool IsValidDecrement(Stack<int> preservedNumbers)
-        {
-            return preservedNumbers.Peek() != 5 && preservedNumbers.Peek() != 50 && preservedNumbers.Peek() != 500;
         }
 
         private int SummarizeNumbers(Stack<int> preservedNumbers)
@@ -157,6 +148,23 @@ namespace Kata.Converter
             }
             return result;
         }
-        #endregion
+
+        private bool HasDecrementNumber(Stack<int> preservedNumbers)
+        {
+            return preservedNumbers.Peek() == 1 || preservedNumbers.Peek() == 10 || preservedNumbers.Peek() == 100;
+        }
+
+        private void CheckDuplication(Stack<int> preservedNumbers)
+        {
+            if (preservedNumbers.Count > 3)
+            {
+                throw new InvalidOperationException();
+            }
+            else if (preservedNumbers.Count >= 2 && 
+                (preservedNumbers.Peek() == 5 || preservedNumbers.Peek() == 50 || preservedNumbers.Peek() == 500))
+            {
+                throw new InvalidOperationException();
+            }
+        }
     }
 }
