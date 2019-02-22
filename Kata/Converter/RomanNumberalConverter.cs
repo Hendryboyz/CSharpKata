@@ -23,20 +23,17 @@ namespace Kata.Converter
                 { 500, "D" },
                 { 1000, "M" }
             };
-
             _romanDecimalTable = new Dictionary<char, int>()
             {
                 { 'I', 1 },
-                { 'X', 10 },
                 { 'V', 5 },
+                { 'X', 10 },
                 { 'L', 50 },
                 { 'C', 100 },
                 { 'D', 500 },
                 { 'M', 1000 }
             };
         }
-
-        
 
         #region ConvertFromDecimal
         public string ConvertFromDecimal(int number)
@@ -97,74 +94,77 @@ namespace Kata.Converter
         }
         #endregion
 
+        #region ConvertFromRoman
         public int ConvertFromRoman(string romanNumberal)
         {
             int result = 0;
-            Stack<int> preservedNumbers = new Stack<int>();
+            Stack<int> summarizingNumbers = new Stack<int>();
             foreach (char eachNotation in romanNumberal)
             {
                 int currentDecimal = _romanDecimalTable[eachNotation];
-                if (!HasSummarizingNumbers(preservedNumbers))
+                if (!HasSummarizingNumbers(summarizingNumbers))
                 {
-                    preservedNumbers.Push(currentDecimal);
+                    summarizingNumbers.Push(currentDecimal);
                 }
-                else if (preservedNumbers.Peek() > currentDecimal)
+                else if (summarizingNumbers.Peek() == currentDecimal)
                 {
-                    result += SummarizeNumbers(preservedNumbers);
-                    preservedNumbers.Push(currentDecimal);
+                    summarizingNumbers.Push(currentDecimal);
                 }
-                else if (preservedNumbers.Peek() == currentDecimal)
+                else if (summarizingNumbers.Peek() > currentDecimal)
                 {
-                    preservedNumbers.Push(currentDecimal);
+                    result += SummarizeResult(summarizingNumbers);
+                    summarizingNumbers.Push(currentDecimal);
                 }
-                else if (HasDecrementNumber(preservedNumbers))
+                else if (ContainLegalDecrement(summarizingNumbers))
                 {
-                    result += (currentDecimal - preservedNumbers.Pop());
+                    result += (currentDecimal - summarizingNumbers.Pop());
                 }
                 else
                 {
                     throw new InvalidOperationException();
                 }
 
-                CheckDuplication(preservedNumbers);
+                VerifyDuplicationNumbers(summarizingNumbers);
             }
 
-            result += SummarizeNumbers(preservedNumbers);
+            result += SummarizeResult(summarizingNumbers);
             return result;
         }
 
-
-        private bool HasSummarizingNumbers(Stack<int> preservedNumber)
+        private bool HasSummarizingNumbers(Stack<int> summarizingNumber)
         {
-            return preservedNumber.Count > 0;
+            return summarizingNumber.Count > 0;
         }
 
-        private int SummarizeNumbers(Stack<int> preservedNumbers)
+        private int SummarizeResult(Stack<int> summarizingNumbers)
         {
             int result = 0;
-            while (HasSummarizingNumbers(preservedNumbers))
+            while (HasSummarizingNumbers(summarizingNumbers))
             {
-                result += preservedNumbers.Pop();
+                result += summarizingNumbers.Pop();
             }
             return result;
         }
 
-        private bool HasDecrementNumber(Stack<int> preservedNumbers)
+        private bool ContainLegalDecrement(Stack<int> summarizingNumbers)
         {
-            return preservedNumbers.Peek() == 1 || preservedNumbers.Peek() == 10 || preservedNumbers.Peek() == 100;
+            return summarizingNumbers.Peek() == 1 || summarizingNumbers.Peek() == 10 || summarizingNumbers.Peek() == 100;
         }
 
-        private void CheckDuplication(Stack<int> preservedNumbers)
+        private void VerifyDuplicationNumbers(Stack<int> summarizingNumbers)
         {
-            if (preservedNumbers.Count > 3)
-            {
-                throw new InvalidOperationException();
-            }
-            else if (preservedNumbers.Count >= 2 && 
-                (preservedNumbers.Peek() == 5 || preservedNumbers.Peek() == 50 || preservedNumbers.Peek() == 500))
+            if (summarizingNumbers.Count > 3 ||
+                ContainDuplicatedMiddleNumber(summarizingNumbers))
             {
                 throw new InvalidOperationException();
             }
         }
+
+        private bool ContainDuplicatedMiddleNumber(Stack<int> summarizingNumbers)
+        {
+            return summarizingNumbers.Count > 1 &&
+                (summarizingNumbers.Peek() == 5 || summarizingNumbers.Peek() == 50 || summarizingNumbers.Peek() == 500);
+        }
+        #endregion
     }
 }

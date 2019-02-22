@@ -30,21 +30,21 @@ namespace Kata.Tests
         }
 
         [TestCase("II", ExpectedResult = 2)]
-        [TestCase("X", ExpectedResult = 10)]
         [TestCase("V", ExpectedResult = 5)]
+        [TestCase("X", ExpectedResult = 10)]
         [TestCase("VI", ExpectedResult = 6)]
         [TestCase("IV", ExpectedResult = 4)]
         [TestCase("IX", ExpectedResult = 9)]
-        public int GivenRomanNumberalLessThanX_WhenConvertFromRoman_ThenReturnDecimal(string roman)
+        public int GivenRomanNumberalLessEqualX_WhenConvertFromRoman_ThenReturnDecimal(string roman)
         {
-            return converter.ConvertFromRoman(roman); 
+            return converter.ConvertFromRoman(roman);
         }
 
         [TestCase("L", ExpectedResult = 50)]
         [TestCase("C", ExpectedResult = 100)]
         [TestCase("D", ExpectedResult = 500)]
         [TestCase("M", ExpectedResult = 1000)]
-        public int GivenBaseRomanNumberalNotation_WhenConvertFromRoman_ThenReturnDecimal(string roman)
+        public int GivenBaseRomanNotation_WhenConvertFromRoman_ThenReturnDecimal(string roman)
         {
             return converter.ConvertFromRoman(roman);
         }
@@ -60,7 +60,7 @@ namespace Kata.Tests
         [TestCase("VX")]
         [TestCase("LC")]
         [TestCase("DM")]
-        public void GivenInvalidDerementNotation_WhenConvertFromRoman_ThenThrowInvalidOperationException(string roman)
+        public void GivenInvalidDecrementRomanNumberal_WhenConvertFromRoman_ThenReturnInvalidOperationException(string roman)
         {
             Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRoman(roman));
         }
@@ -70,7 +70,7 @@ namespace Kata.Tests
         [TestCase("VV")]
         [TestCase("LL")]
         [TestCase("DD")]
-        public void GivenInvalidDuplicatedNotation_WhenConvertFromRoman_ThenThrowInvalidOperationException(string roman)
+        public void GivenInvalidDuplicateRomanNumberal_WhenConvertFromRoman_ThenReturnInvalidOperationException(string roman)
         {
             Assert.Throws<InvalidOperationException>(() => converter.ConvertFromRoman(roman));
         }
