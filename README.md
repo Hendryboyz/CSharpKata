@@ -17,5 +17,5 @@ Just a Kata repository, What are you doing ?? :)
  
  * [Potter](http://codingdojo.org/kata/Potter/)
  * [Number to LCD](http://codingdojo.org/kata/NumberToLCD/)
- * [Roman Calculator](http://codingdojo.org/kata/RomanCalculator/) -- temporary skipping
+ * [Roman Calculator](http://codingdojo.org/kata/RomanCalculator/)
  * [Roman Numberals](http://codingdojo.org/kata/RomanNumerals/)
