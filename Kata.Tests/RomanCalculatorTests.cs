@@ -20,12 +20,23 @@ namespace Kata.Tests
         {
             CanCreate();
         }
-        
+
         [Test]
-        public void CanAddTwoRomanString()
+        public void CanAdd()
         {
             string result = calculator.Add("I", "I");
             Assert.AreEqual("II", result);
+        }
+
+        [TestCase("II", "I", ExpectedResult = "III")]
+        [TestCase("II", "II", ExpectedResult = "IV")]
+        [TestCase("IV", "I", ExpectedResult = "V")]
+        //[TestCase("VII", "II", ExpectedResult = "IX")]
+        [TestCase("IX", "I", ExpectedResult = "X")]
+        //[TestCase("V", "IV", ExpectedResult = "IX")]
+        public string GivenRomanNumberalLessEqualX_WhenAdd_ThenReturnResult(string augend, string addend)
+        {
+            return calculator.Add(augend, addend);
         }
     }
 }
