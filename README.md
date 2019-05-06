@@ -7,6 +7,11 @@
 ## Document
 Just a Kata repository, What are you doing ?? :)
 
+## Testing Package
+ * NUnit
+ * NSub
+ * FluentAssertions
+
 ## Practice Kata List
 
  * [Tennis Game](http://codingdojo.org/kata/Tennis/)
@@ -20,3 +25,4 @@ Just a Kata repository, What are you doing ?? :)
  * [Roman Calculator](http://codingdojo.org/kata/RomanCalculator/)
  * [Roman Numberals](http://codingdojo.org/kata/RomanNumerals/)
  * [Dictionary Replacer](http://codingdojo.org/kata/DictionaryReplacer/)
+ * [Minesweeper](http://codingdojo.org/kata/Minesweeper/)
