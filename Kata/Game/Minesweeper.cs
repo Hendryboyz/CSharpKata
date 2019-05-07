@@ -5,36 +5,114 @@ namespace Kata.Game
 {
     public class Minesweeper
     {
-        private char[,] board;
+        private char[,] _board;
+        private int _boardRowCount;
+        private int _boardColumnCount;
+        private int _row;
         private int _field;
 
         public Minesweeper()
         {
             _field = 0;
         }
-        public string BuryMine(int row, int column, string mine)
+
+        public int SetBoard(int boardRows, int boardColumn)
         {
-            board = new char[row, column];
-            StringBuilder sb = new StringBuilder(
-                string.Format("Field #{0}:\n", ++_field));
-            // TODO algorithm has some problem to fix
-            foreach (string eachRow in mine.Split("\n"))
+            _field++;
+            _boardRowCount = boardRows;
+            _boardColumnCount = boardColumn;
+            _board = new char[boardRows, boardColumn];
+            _row = 0;
+            return _board.Length;
+        }
+
+        public void BuryMine(string rowOfBoard)
+        {
+            int _col = 0;
+            foreach (char point in rowOfBoard)
             {
-                foreach (char eachColumn in eachRow)
+                _board[_row, _col] = point;
+                _col++;
+            }
+            _row++;
+        }
+
+        public string GetStatus()
+        {
+            StringBuilder sb = new StringBuilder(
+                string.Format("Field #{0}:\n", _field));
+            int[,] tips = InitialTipsBoard();
+            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
+            {
+                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
                 {
-                    if ('*' == eachColumn)
+                    bool isMinePoint = '*' == _board[rowIdx, colIdx];
+                    if (isMinePoint)
+                    {
+                        tips[rowIdx, colIdx] = -1;
+
+                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx);
+                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx);
+                        IncreaseTipsBoard(tips, rowIdx, colIdx + 1);
+                        IncreaseTipsBoard(tips, rowIdx, colIdx - 1);
+
+                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx + 1);
+                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx - 1);
+                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx - 1);
+                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx + 1);
+                    }
+                }
+            }
+
+            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
+            {
+                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
+                {
+                    bool isMine = -1 == tips[rowIdx, colIdx];
+                    if (isMine)
                     {
                         sb.Append('*');
                     }
                     else
                     {
-                        sb.Append("1");
+                        sb.Append(tips[rowIdx, colIdx]);
                     }
                 }
                 sb.Append("\n");
-
             }
-            return "Field #1:\n*1\n11\n";
+            return sb.ToString();
+        }
+
+        private int[,] InitialTipsBoard()
+        {
+            int[,] tips = new int[_boardRowCount, _boardColumnCount];
+            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
+            {
+                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
+                {
+                    tips[rowIdx, colIdx] = 0;
+                }
+            }
+            return tips;
+        }
+
+        private void IncreaseTipsBoard(int[,] tips, int rowIdx, int colIdx)
+        {
+            if (IsValidRowIndex(rowIdx) && IsValidColumnIndex(colIdx) &&
+                tips[rowIdx, colIdx] != -1)
+            {
+                tips[rowIdx, colIdx]++;
+            }
+        }
+
+        private bool IsValidColumnIndex(int index)
+        {
+            return 0 <= index && index < _boardColumnCount;
+        }
+
+        private bool IsValidRowIndex(int index)
+        {
+            return 0 <= index && index < _boardRowCount;
         }
     }
 }
