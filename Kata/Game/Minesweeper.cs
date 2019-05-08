@@ -5,77 +5,67 @@ namespace Kata.Game
 {
     public class Minesweeper
     {
-        private char[,] _board;
-        private int _boardRowCount;
-        private int _boardColumnCount;
-        private int _row;
+        private readonly int LANDMINE_MARK = -1;
+
         private int _field;
+        private int _rowIdx;
+        private int _rowCount;
+        private int _columnCount;
+        private char[,] _board;
 
         public Minesweeper()
         {
             _field = 0;
         }
 
-        public int SetBoard(int boardRows, int boardColumn)
+        public int SetBoard(int rowCount, int columnCount)
         {
             _field++;
-            _boardRowCount = boardRows;
-            _boardColumnCount = boardColumn;
-            _board = new char[boardRows, boardColumn];
-            _row = 0;
-            return _board.Length;
+            _rowCount = rowCount;
+            _columnCount = columnCount;
+            _rowIdx = 0;
+            _board = new char[rowCount, columnCount];
+            return rowCount * columnCount;
         }
 
-        public void BuryMine(string rowOfBoard)
+        public void BuryLandmine(string rolOfLandmine)
         {
-            int _col = 0;
-            foreach (char point in rowOfBoard)
+            int columnIdx = 0;
+            foreach (char eachPoint in rolOfLandmine)
             {
-                _board[_row, _col] = point;
-                _col++;
+                _board[_rowIdx, columnIdx] = eachPoint;
+                columnIdx++;
             }
-            _row++;
+            _rowIdx++;
         }
 
-        public string GetStatus()
+        public string CheckStatus()
         {
+            int[,] status = new int[_rowCount, _columnCount];
+
+            IterateBoard((rowIndex, colIdx) => 
+            {
+                bool isLandmine = _board[rowIndex, colIdx].Equals('*');
+                if (isLandmine)
+                {
+                    status[rowIndex, colIdx] = LANDMINE_MARK;
+                    CountAdjacentLandmine(status, rowIndex, colIdx);
+                }
+            });
+
             StringBuilder sb = new StringBuilder(
                 string.Format("Field #{0}:\n", _field));
-            int[,] tips = InitialTipsBoard();
-            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
+            for (int rowIndex = 0; rowIndex < _rowCount; rowIndex++)
             {
-                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
+                for (int colIdx = 0; colIdx < _columnCount; colIdx++)
                 {
-                    bool isMinePoint = '*' == _board[rowIdx, colIdx];
-                    if (isMinePoint)
+                    if (IsLandMine(status, rowIndex, colIdx))
                     {
-                        tips[rowIdx, colIdx] = -1;
-
-                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx);
-                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx);
-                        IncreaseTipsBoard(tips, rowIdx, colIdx + 1);
-                        IncreaseTipsBoard(tips, rowIdx, colIdx - 1);
-
-                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx + 1);
-                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx - 1);
-                        IncreaseTipsBoard(tips, rowIdx + 1, colIdx - 1);
-                        IncreaseTipsBoard(tips, rowIdx - 1, colIdx + 1);
-                    }
-                }
-            }
-
-            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
-            {
-                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
-                {
-                    bool isMine = -1 == tips[rowIdx, colIdx];
-                    if (isMine)
-                    {
-                        sb.Append('*');
+                        sb.Append("*");
                     }
                     else
                     {
-                        sb.Append(tips[rowIdx, colIdx]);
+                        sb.Append(status[rowIndex, colIdx]);
                     }
                 }
                 sb.Append("\n");
@@ -83,36 +73,52 @@ namespace Kata.Game
             return sb.ToString();
         }
 
-        private int[,] InitialTipsBoard()
+        public void IterateBoard(Action<int, int> action)
         {
-            int[,] tips = new int[_boardRowCount, _boardColumnCount];
-            for (int rowIdx = 0; rowIdx < _boardRowCount; rowIdx++)
+            for (int rowIndex = 0; rowIndex < _rowCount; rowIndex++)
             {
-                for (int colIdx = 0; colIdx < _boardColumnCount; colIdx++)
+                for (int colIdx = 0; colIdx < _columnCount; colIdx++)
                 {
-                    tips[rowIdx, colIdx] = 0;
+                    action(rowIndex, colIdx);
                 }
             }
-            return tips;
         }
 
-        private void IncreaseTipsBoard(int[,] tips, int rowIdx, int colIdx)
+        private void CountAdjacentLandmine(int[,] status, int rowIndex, int colIdx)
         {
-            if (IsValidRowIndex(rowIdx) && IsValidColumnIndex(colIdx) &&
-                tips[rowIdx, colIdx] != -1)
+            IncreaseLandMine(status, rowIndex + 1, colIdx);
+            IncreaseLandMine(status, rowIndex - 1, colIdx);
+            IncreaseLandMine(status, rowIndex, colIdx + 1);
+            IncreaseLandMine(status, rowIndex, colIdx - 1);
+
+            IncreaseLandMine(status, rowIndex + 1, colIdx + 1);
+            IncreaseLandMine(status, rowIndex - 1, colIdx + 1);
+            IncreaseLandMine(status, rowIndex + 1, colIdx - 1);
+            IncreaseLandMine(status, rowIndex - 1, colIdx - 1);
+        }
+
+        private void IncreaseLandMine(int[,] status, int rowIndex, int colIdx)
+        {
+            if (IsValidRowIndex(rowIndex) && IsValidColumnIndex(colIdx) && 
+                !IsLandMine(status, rowIndex, colIdx))
             {
-                tips[rowIdx, colIdx]++;
+                status[rowIndex, colIdx]++;
             }
         }
 
-        private bool IsValidColumnIndex(int index)
+        private bool IsValidColumnIndex(int columnIndex)
         {
-            return 0 <= index && index < _boardColumnCount;
+            return 0 <= columnIndex && columnIndex < _columnCount;
         }
 
-        private bool IsValidRowIndex(int index)
+        private bool IsValidRowIndex(int rowIndex)
         {
-            return 0 <= index && index < _boardRowCount;
+            return 0 <= rowIndex && rowIndex < _rowCount;
+        }
+
+        private bool IsLandMine(int[,] status, int rowIndex, int colIdx)
+        {
+            return status[rowIndex, colIdx].Equals(LANDMINE_MARK);
         }
     }
 }
