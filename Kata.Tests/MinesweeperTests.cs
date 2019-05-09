@@ -23,16 +23,16 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void CanSetBoard()
+        public void CanInitialBoard()
         {
-            int boardSize = game.SetBoard(2, 2);
+            int boardSize = game.InitialBoard(2, 2);
             boardSize.Should().Be(4);
         }
 
         [Test]
         public void CanBuryLandmineAndCheckStatus()
         {
-            game.SetBoard(2, 2);
+            game.InitialBoard(2, 2);
             game.BuryLandmine("*.");
             game.BuryLandmine("..");
             string status = game.CheckStatus();
@@ -40,9 +40,9 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void Given4By4Mineboard_WhenCheckStatus_ThenReturnStatus()
+        public void Given4By4Board_WhenBuryAndCheckStatus_ThenReturnBoardStatus()
         {
-            game.SetBoard(4, 4);
+            game.InitialBoard(4, 4);
             game.BuryLandmine("*...");
             game.BuryLandmine("....");
             game.BuryLandmine(".*..");
@@ -54,7 +54,7 @@ namespace Kata.Tests
         [Test]
         public void Given2MineBoard_WhenCheckStatus_ThenReturnStatus()
         {
-            game.SetBoard(4, 4);
+            game.InitialBoard(4, 4);
             game.BuryLandmine("*...");
             game.BuryLandmine("....");
             game.BuryLandmine(".*..");
@@ -62,7 +62,7 @@ namespace Kata.Tests
             string tips = game.CheckStatus();
             tips.Should().Be("Field #1:\n*100\n2210\n1*10\n1110\n");
 
-            game.SetBoard(3, 5);
+            game.InitialBoard(3, 5);
             game.BuryLandmine("**...");
             game.BuryLandmine(".....");
             game.BuryLandmine(".*...");
