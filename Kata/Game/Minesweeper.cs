@@ -8,10 +8,9 @@ namespace Kata.Game
         private readonly char LANDMINE_MARK = '*';
 
         private int _field;
-        private int _rowIdx;
-        private int _rowCount;
+        private int _settingRow;
+        private int _rowConut;
         private int _columnCount;
-
         private char[,] _board;
 
         public Minesweeper()
@@ -21,10 +20,10 @@ namespace Kata.Game
 
         public int InitialBoard(int rowCount, int columnCount)
         {
-            _rowCount = rowCount;
-            _columnCount = columnCount;
             _field++;
-            _rowIdx = 0;
+            _settingRow = 0;
+            _rowConut = rowCount;
+            _columnCount = columnCount;
             _board = new char[rowCount, columnCount];
             return rowCount * columnCount;
         }
@@ -34,15 +33,24 @@ namespace Kata.Game
             int columnIdx = 0;
             foreach (char eachColumn in rowOfBoard)
             {
-                _board[_rowIdx, columnIdx] = eachColumn;
+                CheckBoardStatus(columnIdx);
+                _board[_settingRow, columnIdx] = eachColumn;
                 columnIdx++;
             }
-            _rowIdx++;
+            _settingRow++;
+        }
+
+        private void CheckBoardStatus(int columnIdx)
+        {
+            if (!IsValidRow(_settingRow) || !IsValidColumn(columnIdx))
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         public string CheckStatus()
         {
-            int[,] status = new int[_rowCount, _columnCount];
+            int[,] status = new int[_rowConut, _columnCount];
             IterateBoard((rowIdx, columnIdx) =>
             {
                 if (IsLandmine(rowIdx, columnIdx))
@@ -54,18 +62,21 @@ namespace Kata.Game
                     IncreaseAdjacentLandmineCount(status, rowIdx, columnIdx + 1);
                     IncreaseAdjacentLandmineCount(status, rowIdx, columnIdx - 1);
 
-                    IncreaseAdjacentLandmineCount(status, rowIdx - 1, columnIdx - 1);
                     IncreaseAdjacentLandmineCount(status, rowIdx + 1, columnIdx + 1);
-                    IncreaseAdjacentLandmineCount(status, rowIdx - 1, columnIdx + 1);
+                    IncreaseAdjacentLandmineCount(status, rowIdx - 1, columnIdx - 1);
                     IncreaseAdjacentLandmineCount(status, rowIdx + 1, columnIdx - 1);
+                    IncreaseAdjacentLandmineCount(status, rowIdx - 1, columnIdx + 1);
                 }
             });
-            return ConvertToString(status);
+
+            return ToStringStatus(status);
         }
+
+        
 
         public void IterateBoard(Action<int, int> action)
         {
-            for (int rowIdx = 0; rowIdx < _rowCount; rowIdx++)
+            for (int rowIdx = 0; rowIdx < _rowConut; rowIdx++)
             {
                 for (int columnIdx = 0; columnIdx < _columnCount; columnIdx++)
                 {
@@ -79,30 +90,27 @@ namespace Kata.Game
             return _board[rowIdx, columnIdx].Equals(LANDMINE_MARK);
         }
 
-        private void IncreaseAdjacentLandmineCount(int[,] status, int rowIndex, int columnIdx)
+        private void IncreaseAdjacentLandmineCount(int[,] status, int rowIdx, int columnIdx)
         {
-            if (IsValidRowIndex(rowIndex) &&
-                IsValidColumnIndex(columnIdx) &&
-                !IsLandmine(rowIndex, columnIdx))
+            if (IsValidRow(rowIdx) && IsValidColumn(columnIdx) && !IsLandmine(rowIdx, columnIdx))
             {
-                status[rowIndex, columnIdx] += 1;
+                status[rowIdx, columnIdx]++;
             }
         }
 
-        private bool IsValidRowIndex(int rowIndex)
+        private bool IsValidRow(int rowIdx)
         {
-            return 0 <= rowIndex && rowIndex < _rowCount;
+            return 0 <= rowIdx && rowIdx < _rowConut;
         }
 
-        private bool IsValidColumnIndex(int columnIndex)
+        private bool IsValidColumn(int columnIdx)
         {
-            return 0 <= columnIndex && columnIndex < _columnCount;
+            return 0 <= columnIdx && columnIdx < _columnCount;
         }
 
-        private string ConvertToString(int[,] status)
+        private string ToStringStatus(int[,] status)
         {
-            StringBuilder sb = new StringBuilder(
-                            string.Format("Field #{0}:\n", _field));
+            StringBuilder sb = new StringBuilder(string.Format("Field #{0}:\n", _field));
             IterateBoard((rowIdx, columnIdx) =>
             {
                 if (IsLandmine(rowIdx, columnIdx))
@@ -113,7 +121,7 @@ namespace Kata.Game
                 {
                     sb.Append(status[rowIdx, columnIdx]);
                 }
-                bool isLastColumn = columnIdx == _columnCount - 1;
+                bool isLastColumn = columnIdx == (_columnCount - 1);
                 if (isLastColumn)
                 {
                     sb.Append("\n");

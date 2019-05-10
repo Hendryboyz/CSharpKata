@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Kata.Game;
 using NUnit.Framework;
+using System;
 
 namespace Kata.Tests
 {
@@ -23,14 +24,14 @@ namespace Kata.Tests
         }
 
         [Test]
-        public void CanInitialBoard()
+        public void TestCanInitialBoard()
         {
             int boardSize = game.InitialBoard(2, 2);
             boardSize.Should().Be(4);
         }
 
         [Test]
-        public void CanBuryLandmineAndCheckStatus()
+        public void TestCanBuryLandmineAndCheckStatus()
         {
             game.InitialBoard(2, 2);
             game.BuryLandmine("*.");
@@ -68,6 +69,26 @@ namespace Kata.Tests
             game.BuryLandmine(".*...");
             tips = game.CheckStatus();
             tips.Should().Be("Field #2:\n**100\n33200\n1*100\n");
+        }
+
+        [Test]
+        public void GivenMoreThanRowOfBoard_WhenBury_ThenThrowInvalidOperationException()
+        {
+            game.InitialBoard(4, 4);
+            game.BuryLandmine("*...");
+            game.BuryLandmine("....");
+            game.BuryLandmine(".*..");
+            game.BuryLandmine("....");
+            game.Invoking(game => game.BuryLandmine("....."))
+                .Should().Throw<InvalidOperationException>();
+        }
+
+        [Test]
+        public void GivenMoreThanColumnOfBoard_WhenBury_ThenThrowInvalidOperationException()
+        {
+            game.InitialBoard(4, 4);
+            game.Invoking(game => game.BuryLandmine("*...."))
+                .Should().Throw<InvalidOperationException>();
         }
     }
 }
