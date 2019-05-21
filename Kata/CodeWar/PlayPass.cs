@@ -1,58 +1,55 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
-// https://www.codewars.com/kata/559536379512a64472000053
 namespace Kata.CodeWar
 {
     public class PlayPass
     {
-        public string Convert(string password, int shift)
-        {
-            string result = CircularShiftPassword(password, shift);
-            result = DownCaseOddLetter(result);
-            result = string.Join("", result.Reverse());
+        private readonly int LETTER_COUNT = 26;
 
-            return result;
-        }
-
-        private string DownCaseOddLetter(string password)
+        public string Convert(string passphrase, int shift)
         {
             StringBuilder sb = new StringBuilder();
-            for (int passwordIdx = 0; passwordIdx < password.Length; passwordIdx++)
+            for (int passIndex = 0; passIndex < passphrase.Length; passIndex++)
             {
-                char eachCharacter = password[passwordIdx];
-                if (char.IsLetter(eachCharacter) && (passwordIdx & 1) == 0)
-                {
-                    sb.Append(char.ToLower(eachCharacter));
-                }
-                else
-                {
-                    sb.Append(eachCharacter);
-                }
+                char eachCharacter = passphrase[passIndex];
+                sb.Append(ConvertCharacter(shift, passIndex, eachCharacter));
             }
-            return sb.ToString();
+
+            return string.Join("", sb.ToString().Reverse());
         }
 
-        private string CircularShiftPassword(string password, int shift)
+        private char ConvertCharacter(int shift, int position, char character)
         {
-            StringBuilder shiftedPassword = new StringBuilder();
-            foreach (char eachCharacter in password)
+            if (char.IsLetter(character))
             {
-                if (char.IsLetter(eachCharacter))
-                {
-                    char result = (char)(eachCharacter + shift);
-                    if (result > 'Z')
-                    {
-                        shiftedPassword.Append((char)(result % 'Z' + ('A' - 1)));
-                    }
-                    else
-                    {
-                        shiftedPassword.Append(result);
-                    }
-                }
+                return ShiftCharacter(shift, position, character);
             }
-            return shiftedPassword.ToString();
+            else if (char.IsDigit(character))
+            {
+                return ComplementDigit(character);
+            }
+            else
+            {
+                return character;
+            }
+        }
+
+        private char ShiftCharacter(int shift, int position, char letter)
+        {
+            char shifted = (char)((letter - 'A' + shift) % LETTER_COUNT + 'A');
+            int isOdd = position & 1;
+            if (isOdd == 1)
+            {
+                return char.ToLower(shifted);
+            }
+            return shifted;
+        }
+
+        private char ComplementDigit(char digit)
+        {
+            int complementResult = '9' - digit;
+            return (char)(complementResult + '0'); ;
         }
     }
 }
