@@ -2,7 +2,8 @@
 
 ## Resource
 
-[Coding Dojo](http://codingdojo.org/)
+ * [Coding Dojo](http://codingdojo.org/)
+ * [Code War](https://www.codewars.com/)
 
 ## Document
 Just a Kata repository, What are you doing ?? :)
