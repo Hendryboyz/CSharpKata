@@ -8,21 +8,67 @@ namespace Kata.CodeWar
         public int Check(int number, List<int> awesomePhrases)
         {
             CheckNumberRange(number);
-            if (number < 100)
+
+
+            if (number < 98)
             {
                 return 0;
             }
 
-            int isIntresting = 0;
-            if (IsOnlyFirstDigitNotZero(number) ||
-                IsAllDigitsTheSame(number) ||
-                IsPalindrome(number) ||
-                awesomePhrases.Contains(number))
+            if (number > 99 && CheckingInteresting(number, awesomePhrases))
             {
-                isIntresting = 2;
+                return 2;
             }
 
-            return isIntresting;
+            for (int possibleNumber = number - 2; possibleNumber < number + 3; possibleNumber++)
+            {
+                if (possibleNumber != number && CheckingInteresting(possibleNumber, awesomePhrases))
+                {
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
+        private bool CheckingInteresting(int number, List<int> awesomePhrases)
+        {
+            return IsOnlyFirstDigitNotZero(number) ||
+                    IsAllDigitsTheSame(number) ||
+                    IsPalindrome(number) ||
+                    IsIncrementingSequence(number) ||
+                    IsDescrementingSequence(number) ||
+                    awesomePhrases.Contains(number);
+        }
+
+        private bool IsIncrementingSequence(int number)
+        {
+            char[] digits = Convert.ToString(number).ToCharArray();
+            
+            for (int i = 0; i < digits.Length - 1; i++)
+            {
+                int before = digits[i] - '0';
+                int after = (digits[i + 1] - '0') == 0 ? 10 : digits[i + 1] - '0';
+                
+                if (after - before != 1)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool IsDescrementingSequence(int number)
+        {
+            char[] digits = Convert.ToString(number).ToCharArray();
+            for (int i = 0; i < digits.Length - 1 ; i++)
+            {
+                if (digits[i] - digits[i + 1] != 1)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private bool IsPalindrome(int number)
