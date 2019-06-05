@@ -63,9 +63,10 @@ namespace Kata.Tests
         }
 
         [Test, MaxTime(12000)]
+        [Timeout(12000)]
         public void GivenLargeNumber_WhenRemove_ThenReturnNotEmptyListInPeriodTime()
         {
-            List<long[]> possibleRemoval = removeNumber.Remove(int.MaxValue);
+            List<long[]> possibleRemoval = removeNumber.Remove(1000008);
             possibleRemoval.Should().NotBeEmpty();
         }
     }

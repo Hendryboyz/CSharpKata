@@ -12,16 +12,10 @@ namespace Kata.CodeWar
             long sum = (number + 1) * number / 2;
             for (long i = 1; i <= number; i++)
             {
-                for (long j = 1; j <= number; j++)
+                long j = (sum - i) / (i + 1);
+                if (0 < j && j < number && (sum == i * j + i + j))
                 {
-                    if (j == i)
-                    {
-                        continue;
-                    }
-                    if (i * j == (sum - i - j))
-                    {
-                        possibleRemoval.Add(new long[] { i, j });
-                    }
+                    possibleRemoval.Add(new long[] { i, j });
                 }
             }
             return possibleRemoval;
