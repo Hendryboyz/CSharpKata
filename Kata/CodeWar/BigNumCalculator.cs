@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Kata.CodeWar
@@ -35,6 +36,34 @@ namespace Kata.CodeWar
                 sum.Insert(0, carry);
             }
             return sum.ToString();
+        }
+
+        public string Multiple(string multiplicand, string multiplier)
+        {
+            if (multiplier.Length > multiplicand.Length)
+            {
+                string temp = multiplicand;
+                multiplicand = multiplier;
+                multiplier = temp;
+            }
+
+            StringBuilder multiple = new StringBuilder();
+            int carry = 0;
+            int multiplicandLastIdx = multiplicand.Length - 1;
+            int multiplierInt = Convert.ToInt32(multiplier);
+            for (int index = multiplicandLastIdx; index >= 0; index--)
+            {
+                int multiplicandDigit = multiplicand[index] - '0';
+                int digitMultiple = multiplicandDigit * multiplierInt + carry;
+                multiple.Insert(0, digitMultiple % 10);
+                carry = digitMultiple / 10;
+            }
+
+            if (carry > 0)
+            {
+                multiple.Insert(0, carry);
+            }
+            return multiple.ToString();
         }
     }
 }

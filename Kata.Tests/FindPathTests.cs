@@ -22,7 +22,7 @@ namespace Kata.Tests
             CanCreate();
         }
 
-        [Test]
+        //[Test]
         public void TestIsExitExisting()
         {
             string maze = "..\n" +
@@ -31,7 +31,7 @@ namespace Kata.Tests
             isExitExisting.Should().BeFalse();
         }
 
-        [Test]
+        //[Test]
         public void Given4By4MazeWithExit_WhenIsExitExisting_ThenReturnTrue()
         {
             string maze = ".W\n" +
