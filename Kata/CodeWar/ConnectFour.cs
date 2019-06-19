@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kata.CodeWar
 {
@@ -12,28 +13,31 @@ namespace Kata.CodeWar
         {
             int[,] board = new int[6, 7];
             int[] columnIndex = new int[7];
+            int[,] scores = new int[6, 7];
             foreach (string eachPlay in boardState)
             {
                 string[] playInfo = eachPlay.Split("_");
                 int column = playInfo[0][0] - 'A';
-                string color = playInfo[1];
-                board[columnIndex[column]++, column] = color.Equals(RED) ? 1 : 2;
-            }
+                int color = playInfo[1].Equals(RED) ? 1 : 2;
+                int row = columnIndex[column];
+                board[row, column] = color;
 
-            int[,] scores = new int[6, 7];
-            for (int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < 7; j++)
+                int maxConnect = GetPreviousMaxConnection(board, scores, row, column, color);
+                scores[row, column] = maxConnect + 1;
+                if (4 == scores[row, column])
                 {
-                    int color = board[i, j];
-                    if (0 == color) continue;
-                    int maxConnect = GetPreviousMaxConnection(board, scores, i, j, color);
-                    scores[i, j] = maxConnect + 1;
-                    if (4 == scores[i, j])
+                    for (int i = 0; i < 6; i++)
                     {
-                        return board[i, j] == 1 ? RED : YELLOW;
+                        for (int j = 0; j < 7; j++)
+                        {
+                            Console.Write(board[i, j] + ",");
+                        }
+                        Console.WriteLine();
                     }
+                    return board[row, column] == 1 ? RED : YELLOW;
                 }
+
+                columnIndex[column]++;
             }
             return DRAW;
         }
@@ -41,39 +45,35 @@ namespace Kata.CodeWar
         private int GetPreviousMaxConnection(int[,] board, int[,] scores, int i, int j, int color)
         {
             int maxConnect = 0;
-            int previousConnect = GetConnectCount(i - 1, j - 1, board, scores);
-            if (previousConnect > 0 &&
-                previousConnect > maxConnect &&
-                color == board[i - 1, j - 1])
+            for (int iFactor = -1; iFactor <= 1; iFactor++)
             {
-                maxConnect = scores[i - 1, j - 1];
+                for (int jFactor = -1; jFactor <= 1; jFactor++)
+                {
+                    if ((iFactor == 0 && jFactor == 0) || 
+                        (iFactor == 1 && jFactor == 0))
+                    {
+                        continue;
+                    }
+                    int previousConnect = GetPreviousConnection(
+                        board, scores, i + iFactor, j + jFactor, color);
+                    if (previousConnect > maxConnect)
+                    {
+                        maxConnect = previousConnect;
+                    }
+                }
             }
-
-            previousConnect = GetConnectCount(i - 1, j, board, scores);
-            if (previousConnect > 0 &&
-                previousConnect > maxConnect &&
-                color == board[i - 1, j])
-            {
-                maxConnect = scores[i - 1, j];
-            }
-
-            previousConnect = GetConnectCount(i, j - 1, board, scores);
-            if (previousConnect > 0 &&
-                previousConnect > maxConnect &&
-                color == board[i, j - 1])
-            {
-                maxConnect = scores[i, j - 1];
-            }
-
-            previousConnect = GetConnectCount(i - 1, j + 1, board, scores);
-            if (previousConnect > 0 &&
-                previousConnect > maxConnect &&
-                color == board[i - 1, j + 1])
-            {
-                maxConnect = scores[i - 1, j + 1];
-            }
-
             return maxConnect;
+        }
+
+        private int GetPreviousConnection(
+            int[,] board, int[,] scores, int row, int col, int color)
+        {
+            int previousConnect = GetConnectCount(row, col, board, scores);
+            if (previousConnect > 0 && color == board[row, col])
+            {
+                return previousConnect;
+            }
+            return 0;
         }
 
         private int GetConnectCount(int row, int col, int[,] board, int[,] scores)

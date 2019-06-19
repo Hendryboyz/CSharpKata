@@ -30,6 +30,7 @@ namespace Kata.Tests
             string winner = connectFour.WhoIsWinner(new List<string>());
             winner.Should().Be("Draw");
         }
+
         [Test]
         public void GivenRedWin_WhenWhoIsWinner_ThenReturnRed()
         {
@@ -123,6 +124,23 @@ namespace Kata.Tests
                 "F_Yellow",
                 "E_Red",
                 "D_Yellow"
+            };
+            string winner = connectFour.WhoIsWinner(boardStatus);
+            winner.Should().Be("Red");
+        }
+
+        [Test]
+        public void GivenRedWinHorizontal_WhenWhoIsWinner_ThenReturnRed()
+        {
+            List<string> boardStatus = new List<string>()
+            {
+                "C_Red",
+                "B_Yellow",
+                "D_Red",
+                "B_Yellow",
+                "E_Red",
+                "B_Yellow",
+                "F_Red"
             };
             string winner = connectFour.WhoIsWinner(boardStatus);
             winner.Should().Be("Red");
